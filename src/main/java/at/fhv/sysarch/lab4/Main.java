@@ -1,6 +1,7 @@
 package at.fhv.sysarch.lab4;
 
 import at.fhv.sysarch.lab4.game.Game;
+import at.fhv.sysarch.lab4.physics.Physic;
 import at.fhv.sysarch.lab4.rendering.Renderer;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -25,8 +26,11 @@ public class Main extends Application {
             c.getGraphicsContext2D(),
             SCENE_WIDTH, 
             SCENE_HEIGHT);
-        
-        Game game = new Game(renderer);
+
+        Physic physic = new Physic();
+        renderer.setFrameListener(physic);
+
+        Game game = new Game(renderer, physic);
 
         c.setOnMousePressed(game::onMousePressed);
         c.setOnMouseReleased(game::onMouseReleased);

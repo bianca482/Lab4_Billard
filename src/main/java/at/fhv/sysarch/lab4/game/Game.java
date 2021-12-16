@@ -4,14 +4,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import at.fhv.sysarch.lab4.physics.Physic;
 import at.fhv.sysarch.lab4.rendering.Renderer;
 import javafx.scene.input.MouseEvent;
 
 public class Game {
     private final Renderer renderer;
+    private final Physic physic;
 
-    public Game(Renderer renderer) {      
+    public Game(Renderer renderer, Physic physic) {
         this.renderer = renderer;
+        this.physic = physic;
         this.initWorld();
     }
 
@@ -24,6 +27,8 @@ public class Game {
     }
 
     public void onMouseReleased(MouseEvent e) {
+        this.physic.performStrike();
+        //ToDo: Koordinaten berechnen etc.
     }
 
     public void setOnMouseDragged(MouseEvent e) {
@@ -52,6 +57,7 @@ public class Game {
             b.setPosition(x, y);
             b.getBody().setLinearVelocity(0, 0);
             renderer.addBall(b);
+            physic.addBody(b.getBody());
 
             row++;
 
@@ -78,8 +84,10 @@ public class Game {
         Ball.WHITE.setPosition(Table.Constants.WIDTH * 0.25, 0);
         
         renderer.addBall(Ball.WHITE);
+        physic.addBody(Ball.WHITE.getBody());
         
         Table table = new Table();
         renderer.setTable(table);
+        physic.addBody(table.getBody());
     }
 }
