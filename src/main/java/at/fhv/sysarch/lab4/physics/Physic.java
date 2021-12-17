@@ -91,12 +91,12 @@ public class Physic implements ContactListener, StepListener, FrameListener {
 
     @Override
     public boolean persist(PersistedContactPoint point) {
-        return false;
+        return true;
     }
 
     @Override
     public boolean preSolve(ContactPoint point) {
-        return false;
+        return true;
     }
 
     @Override
