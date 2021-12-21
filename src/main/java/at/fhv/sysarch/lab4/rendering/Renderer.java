@@ -251,7 +251,7 @@ public class Renderer extends AnimationTimer {
         this.gc.setTransform(cueTrans);
 
         this.gc.setFill(Color.PAPAYAWHIP);
-        this.gc.fillRect(300, 0, 100, 20);
+        this.gc.fillRect(0, 0, 300, 10);
     }
 
     private void drawFPS(double dt) {

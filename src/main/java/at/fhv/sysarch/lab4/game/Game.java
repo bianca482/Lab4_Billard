@@ -11,6 +11,7 @@ import javafx.scene.input.MouseEvent;
 public class Game {
     private final Renderer renderer;
     private final Physic physic;
+    private Cue cue;
 
     public Game(Renderer renderer, Physic physic) {
         this.renderer = renderer;
@@ -24,6 +25,7 @@ public class Game {
 
         double pX = this.renderer.screenToPhysicsX(x);
         double pY = this.renderer.screenToPhysicsY(y);
+        cue.setPosition(pX, pY);
     }
 
     public void onMouseReleased(MouseEvent e) {
@@ -96,7 +98,7 @@ public class Game {
         renderer.setTable(table);
         physic.addBody(table.getBody());
 
-        Cue cue = new Cue();
+        cue = new Cue();
         renderer.setCue(cue);
         physic.addBody(cue.getBody());
     }
