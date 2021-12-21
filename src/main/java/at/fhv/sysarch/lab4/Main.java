@@ -27,8 +27,10 @@ public class Main extends Application {
             SCENE_WIDTH, 
             SCENE_HEIGHT);
 
-        Physic physic = new Physic();
+        Physic physic = new Physic(renderer);
         renderer.setFrameListener(physic);
+        renderer.setStrikeMessage("Next Strike: Player ");
+        renderer.setCurrentPlayer(1);
 
         Game game = new Game(renderer, physic);
 
