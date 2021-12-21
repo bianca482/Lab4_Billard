@@ -45,6 +45,7 @@ public class Renderer extends AnimationTimer {
     private String strikeMessage;
     private String foulMessage;
     private String actionMessage;
+    private int currentPlayer;
     private int player1Score;
     private int player2Score;
 
@@ -96,6 +97,10 @@ public class Renderer extends AnimationTimer {
         this.player2Score = player2Score;
     }
 
+    public void setCurrentPlayer(int currentPlayer) { this.currentPlayer = currentPlayer; }
+
+    public int getCurrentPlayer() { return currentPlayer; }
+
     public void addBall(Ball b) {
         this.balls.add(b);
     }
@@ -113,6 +118,8 @@ public class Renderer extends AnimationTimer {
     }
 
     public void setCue(Cue cue) { this.cue = cue; }
+
+    public Cue getCue() { return this.cue; }
 
     public double screenToPhysicsX(double screenX) {
         // screen has origin (0/0) top left corner,
@@ -287,7 +294,7 @@ public class Renderer extends AnimationTimer {
         this.gc.fillText(this.actionMessage, 0, 0);
 
         this.gc.setTransform(strikeMsgTrans);
-        this.gc.fillText(this.strikeMessage, 0, 0);
+        this.gc.fillText(String.format("%s %d", this.strikeMessage, this.currentPlayer), 0, 0);
 
         this.gc.setTransform(foulMsgTrans);
         this.gc.fillText(this.foulMessage, 0, 0);
