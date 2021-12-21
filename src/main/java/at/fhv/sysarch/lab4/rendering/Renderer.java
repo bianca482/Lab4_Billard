@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import at.fhv.sysarch.lab4.game.Cue;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Circle;
 import org.dyn4j.geometry.Polygon;
@@ -23,6 +24,7 @@ public class Renderer extends AnimationTimer {
     private long lastUpdate;
     private List<Ball> balls;
     private Table table;
+    private Cue cue;
 
     private final GraphicsContext gc;
 
@@ -109,6 +111,8 @@ public class Renderer extends AnimationTimer {
     public void setFrameListener(FrameListener l) {
         this.frameListener = Optional.of(l);
     }
+
+    public void setCue(Cue cue) { this.cue = cue; }
 
     public double screenToPhysicsX(double screenX) {
         // screen has origin (0/0) top left corner,
@@ -229,6 +233,18 @@ public class Renderer extends AnimationTimer {
 
     private void drawCue() {
         // TODO: draw cue
+        Transform t = this.cue.getBody().getTransform();
+
+        double x = t.getTranslationX() * SCALE;
+        double y = t.getTranslationY() * SCALE;
+
+        Affine cueTrans = new Affine(this.poolCoords);
+        cueTrans.appendTranslation(x, y);
+
+        this.gc.setTransform(cueTrans);
+
+        this.gc.setFill(Color.PAPAYAWHIP);
+        this.gc.fillRect(300, 0, 100, 20);
     }
 
     private void drawFPS(double dt) {

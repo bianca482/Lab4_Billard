@@ -28,8 +28,8 @@ public class Physic implements ContactListener, StepListener, FrameListener {
         this.world.addBody(b);
     }
 
-    public void performStrike() {
-        Vector2 origin = new Vector2(1, 0);
+    public void performStrike(double x, double y) {
+        Vector2 origin = new Vector2(x, y); //Anhand der Koordinaten bestimmen, wo der Stoß stattgefunden hat
         Vector2 direction = new Vector2(-1, 0); //Stoßrichtung nach links
 
         Ray ray = new Ray(origin, direction);

@@ -27,8 +27,14 @@ public class Game {
     }
 
     public void onMouseReleased(MouseEvent e) {
-        this.physic.performStrike();
         //ToDo: Koordinaten berechnen etc.
+        double x = e.getX();
+        double y = e.getY();
+
+        double pX = this.renderer.screenToPhysicsX(x);
+        double pY = this.renderer.screenToPhysicsY(y);
+
+        this.physic.performStrike(pX, pY);
     }
 
     public void setOnMouseDragged(MouseEvent e) {
@@ -89,5 +95,9 @@ public class Game {
         Table table = new Table();
         renderer.setTable(table);
         physic.addBody(table.getBody());
+
+        Cue cue = new Cue();
+        renderer.setCue(cue);
+        physic.addBody(cue.getBody());
     }
 }
