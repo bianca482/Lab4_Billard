@@ -25,7 +25,7 @@ public class Game {
 
         double pX = this.renderer.screenToPhysicsX(x);
         double pY = this.renderer.screenToPhysicsY(y);
-        cue.setPosition(pX, pY);
+        cue.setStartPosition(pX, pY);
     }
 
     public void onMouseReleased(MouseEvent e) {
@@ -36,7 +36,7 @@ public class Game {
         double pX = this.renderer.screenToPhysicsX(x);
         double pY = this.renderer.screenToPhysicsY(y);
 
-        this.physic.performStrike(pX, pY);
+        this.physic.performStrike(cue.getStartX(), cue.getStartY(), pX, pY);
     }
 
     public void setOnMouseDragged(MouseEvent e) {
@@ -45,6 +45,7 @@ public class Game {
 
         double pX = renderer.screenToPhysicsX(x);
         double pY = renderer.screenToPhysicsY(y);
+        cue.setEndPosition(pX, pY);
     }
 
     private void placeBalls(List<Ball> balls) {

@@ -32,9 +32,9 @@ public class Physic implements ContactListener, StepListener, FrameListener {
         this.world.addBody(b);
     }
 
-    public void performStrike(double x, double y) {
-        Vector2 origin = new Vector2(x, y); //Anhand der Koordinaten bestimmen, wo der Stoß stattgefunden hat
-        Vector2 direction = new Vector2(-1, 0); //Stoßrichtung nach links
+    public void performStrike(double startx, double starty, double endx, double endy) {
+        Vector2 origin = new Vector2(startx, starty); //Anhand der Koordinaten bestimmen, wo der Stoß stattgefunden hat
+        Vector2 direction = origin.difference(endx, endy); //Stoßrichtung nach links
 
         Ray ray = new Ray(origin, direction);
         List<RaycastResult> results = new ArrayList<>();
@@ -83,7 +83,10 @@ public class Physic implements ContactListener, StepListener, FrameListener {
 
     @Override
     public void end(Step step, World world) {
-
+        // überprüfen ob kugeln sich noch bewegen
+        for (Body body : world.getBodies()){
+            body.getLinearVelocity().getMagnitude(); // Magnitude = Größenordnung (wenn Wert 0 --> nichts bewegt sich)
+        }
     }
 
     @Override
@@ -106,6 +109,9 @@ public class Physic implements ContactListener, StepListener, FrameListener {
 
     @Override
     public boolean persist(PersistedContactPoint point) {
+        if(point.isSensor()){
+            // welcher von den point.getbody ist die Kugel
+        }
         return true;
     }
 

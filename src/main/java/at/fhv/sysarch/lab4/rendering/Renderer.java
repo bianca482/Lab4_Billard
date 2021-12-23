@@ -244,14 +244,21 @@ public class Renderer extends AnimationTimer {
 
         double x = t.getTranslationX() * SCALE;
         double y = t.getTranslationY() * SCALE;
+        double endX = cue.getEndX() * SCALE;
+        double endY = cue.getEndY() * SCALE;
+
 
         Affine cueTrans = new Affine(this.poolCoords);
-        cueTrans.appendTranslation(x, y);
+//        cueTrans.appendTranslation(x, y);
+//        cueTrans.appendTranslation(endX, endY);
 
         this.gc.setTransform(cueTrans);
-
+        this.gc.setLineWidth(10);
+        this.gc.setStroke(Color.BLACK);
+        this.gc.strokeLine(x, y, endX, endY);
         this.gc.setFill(Color.PAPAYAWHIP);
         this.gc.fillRect(0, 0, 300, 10);
+
     }
 
     private void drawFPS(double dt) {
