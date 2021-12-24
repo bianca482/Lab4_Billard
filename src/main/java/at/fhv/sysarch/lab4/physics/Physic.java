@@ -11,13 +11,13 @@ import org.dyn4j.geometry.Ray;
 import org.dyn4j.geometry.Vector2;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class Physic implements ContactListener, StepListener, FrameListener {
 
-    private World world;
-    private Renderer renderer;
+    private final static int FORCE = 500; //Kraft vorgeben
+    private final World world;
+    private final Renderer renderer;
 
     public Physic(Renderer renderer) {
         this.world = new World();
@@ -32,9 +32,9 @@ public class Physic implements ContactListener, StepListener, FrameListener {
         this.world.addBody(b);
     }
 
-    public void performStrike(double startx, double starty, double endx, double endy) {
-        Vector2 origin = new Vector2(startx, starty); //Anhand der Koordinaten bestimmen, wo der Stoß stattgefunden hat
-        Vector2 direction = origin.difference(endx, endy); //Stoßrichtung nach links
+    public void performStrike(double startX, double startY, double endX, double endY) {
+        Vector2 origin = new Vector2(startX, startY); //Anhand der Koordinaten bestimmen, wo der Stoß stattgefunden hat
+        Vector2 direction = origin.difference(endX, endY); //Stoßrichtung berechnen
 
         Ray ray = new Ray(origin, direction);
         List<RaycastResult> results = new ArrayList<>();
@@ -42,9 +42,7 @@ public class Physic implements ContactListener, StepListener, FrameListener {
         boolean hit = this.world.raycast(ray, 0, true, false, results); // prüfen ob was getroffen wurde und wenn ja, was getroffen wurde (=results)
 
         if (hit) {
-            System.out.println(results.get(0).getBody().getUserData());
-
-            direction.multiply(500); //Kraft vorgeben
+            direction.multiply(FORCE); //Da mit der Direction multipliziert, wird gewirkte Kraft bei größerem Abstand größer
 
             results.get(0).getBody().applyForce(direction);
 
@@ -111,6 +109,7 @@ public class Physic implements ContactListener, StepListener, FrameListener {
     public boolean persist(PersistedContactPoint point) {
         if(point.isSensor()){
             // welcher von den point.getbody ist die Kugel
+            //Prüfen wie wie weit Kugel über Pocket geht --> Überschneiden sie sich deutlich? Dann wird gelocht
         }
         return true;
     }

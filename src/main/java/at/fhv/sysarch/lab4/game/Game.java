@@ -25,11 +25,11 @@ public class Game {
 
         double pX = this.renderer.screenToPhysicsX(x);
         double pY = this.renderer.screenToPhysicsY(y);
+
         cue.setStartPosition(pX, pY);
     }
 
     public void onMouseReleased(MouseEvent e) {
-        //ToDo: Koordinaten berechnen etc.
         double x = e.getX();
         double y = e.getY();
 
@@ -45,6 +45,7 @@ public class Game {
 
         double pX = renderer.screenToPhysicsX(x);
         double pY = renderer.screenToPhysicsY(y);
+
         cue.setEndPosition(pX, pY);
     }
 

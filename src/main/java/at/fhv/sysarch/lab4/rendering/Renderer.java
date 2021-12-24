@@ -239,7 +239,6 @@ public class Renderer extends AnimationTimer {
     }
 
     private void drawCue() {
-        // TODO: draw cue
         Transform t = this.cue.getBody().getTransform();
 
         double x = t.getTranslationX() * SCALE;
@@ -247,18 +246,12 @@ public class Renderer extends AnimationTimer {
         double endX = cue.getEndX() * SCALE;
         double endY = cue.getEndY() * SCALE;
 
-
         Affine cueTrans = new Affine(this.poolCoords);
-//        cueTrans.appendTranslation(x, y);
-//        cueTrans.appendTranslation(endX, endY);
 
         this.gc.setTransform(cueTrans);
         this.gc.setLineWidth(10);
-        this.gc.setStroke(Color.BLACK);
+        this.gc.setStroke(Color.PAPAYAWHIP);
         this.gc.strokeLine(x, y, endX, endY);
-        this.gc.setFill(Color.PAPAYAWHIP);
-        this.gc.fillRect(0, 0, 300, 10);
-
     }
 
     private void drawFPS(double dt) {
