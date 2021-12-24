@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import static at.fhv.sysarch.lab4.game.Ball.WHITE;
+
 public class Physic implements ContactListener, StepListener, FrameListener {
 
     private final static int FORCE = 500; //Kraft vorgeben
@@ -32,6 +34,8 @@ public class Physic implements ContactListener, StepListener, FrameListener {
     }
 
     public void performStrike(double startX, double startY, double endX, double endY) {
+        this.renderer.setFoulMessage("");
+
         Vector2 origin = new Vector2(startX, startY); //Anhand der Koordinaten bestimmen, wo der Stoß stattgefunden hat
         Vector2 direction = origin.difference(endX, endY); //Stoßrichtung berechnen
 
@@ -41,20 +45,34 @@ public class Physic implements ContactListener, StepListener, FrameListener {
         boolean hit = this.world.raycast(ray, 0, true, false, results); // prüfen ob was getroffen wurde und wenn ja, was getroffen wurde (=results)
 
         if (hit) {
-            direction.multiply(FORCE); //Da mit der Direction multipliziert, wird gewirkte Kraft bei größerem Abstand größer
+            // Angestoßenes Objekt
+            Body hitObjectData = results.get(0).getBody();
 
-            results.get(0).getBody().applyForce(direction);
+            // Foul: Nothing hit.
+            // Keine UserData? Dann kann es kein Ball sein
+//            if (hitObjectData.getUserData() == null) {
+//                this.renderer.setFoulMessage("Foul: Nothing hit.");
+//                this.renderer.changeCurrentPlayerScore(-1);
+//                this.renderer.changeCurrentPlayer();
+//                return;
+//            }
 
-//            results.forEach(result -> {
-//                this.renderer.setActionMessage("White ball did touch \n" + result.getBody().getUserData().toString());
-//            });
-        } else {
-            //this.renderer.setActionMessage("White ball did not touch any other ball");
-            if (this.renderer.getCurrentPlayer() == 1) {
-                this.renderer.setCurrentPlayer(2);
-            } else {
-                this.renderer.setCurrentPlayer(1);
+            // ToDo: Foul: It is a foul if the white ball does not touch any object ball.
+            if (hitObjectData.getUserData() == null) {
+                this.renderer.setFoulMessage("Foul: The white ball did not touch any object ball.");
+                this.renderer.changeCurrentPlayerScore(-1);
+                this.renderer.changeCurrentPlayer();
             }
+            // Foul: It is a foul if any other ball than the white one is stroke by the cue.
+            else if (!hitObjectData.getUserData().equals(WHITE)) {
+                this.renderer.setFoulMessage("Foul: Player did not hit the white ball.");
+                this.renderer.changeCurrentPlayerScore(-1);
+                this.renderer.changeCurrentPlayer();
+            }
+
+            //Weiße Kugel stoßen
+            direction.multiply(FORCE); //Da mit der Direction multipliziert, wird gewirkte Kraft bei größerem Abstand größer
+            hitObjectData.applyForce(direction);
         }
     }
 
@@ -80,20 +98,13 @@ public class Physic implements ContactListener, StepListener, FrameListener {
 
     @Override
     public void end(Step step, World world) {
-        // überprüfen ob Kugeln sich noch bewegen
+        // Überprüfen ob Kugeln sich noch bewegen
 //        List<Double> movingObjects = new LinkedList<>();
 //
 //        for (Body body : world.getBodies()) {
 //            double magnitude = body.getLinearVelocity().getMagnitude(); // Magnitude = Größenordnung (wenn Wert 0 --> nichts bewegt sich)
 //            if (magnitude != 0) {
 //                movingObjects.add(magnitude);
-//            }
-//        }
-//        if (movingObjects.size() == 0) {
-//            if (this.renderer.getCurrentPlayer() == 1) {
-//                this.renderer.setCurrentPlayer(2);
-//            } else {
-//                this.renderer.setCurrentPlayer(1);
 //            }
 //        }
     }
@@ -118,15 +129,27 @@ public class Physic implements ContactListener, StepListener, FrameListener {
         if (point.isSensor()) {
             Body ball;
 
+            //Prüfen, welcher von den beiden Bodies der Ball ist
             if (point.getBody1().getUserData() instanceof Ball) {
                 ball = point.getBody1();
             } else {
                 ball = point.getBody2();
             }
 
+            //Prüfen, um wie viel sich Ball und Pocket überschneiden
             if (point.getDepth() >= 0.09) {
                 this.renderer.removeBall((Ball) ball.getUserData());
             }
+
+            // ToDo: Richtige Position finden
+            // Foul: It is a foul if the white ball is pocketed.
+//            if (ball.getUserData().equals(WHITE)) {
+//                this.renderer.setFoulMessage("Foul: Player pocketed white ball.");
+//                this.renderer.changeCurrentPlayerScore(-1);
+//                this.renderer.changeCurrentPlayer();
+//            } else {
+//                this.renderer.changeCurrentPlayerScore(1);
+//            }
         }
         return true;
     }

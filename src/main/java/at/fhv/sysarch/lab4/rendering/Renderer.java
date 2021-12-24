@@ -121,6 +121,22 @@ public class Renderer extends AnimationTimer {
 
     public Cue getCue() { return this.cue; }
 
+    public void changeCurrentPlayer() {
+        if (this.currentPlayer == 1) {
+            this.currentPlayer = 2;
+        } else {
+            this.currentPlayer = 1;
+        }
+    }
+
+    public void changeCurrentPlayerScore(int value) {
+        if (this.currentPlayer == 1) {
+            this.player1Score += value;
+        } else {
+            this.player2Score += value;
+        }
+    }
+
     public double screenToPhysicsX(double screenX) {
         // screen has origin (0/0) top left corner,
         // physics has origin (0/0) center of the screen
