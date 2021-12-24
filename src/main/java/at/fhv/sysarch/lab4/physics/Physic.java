@@ -1,16 +1,15 @@
 package at.fhv.sysarch.lab4.physics;
 
+import at.fhv.sysarch.lab4.game.Ball;
 import at.fhv.sysarch.lab4.rendering.FrameListener;
 import at.fhv.sysarch.lab4.rendering.Renderer;
 import org.dyn4j.dynamics.*;
-import org.dyn4j.dynamics.contact.ContactListener;
-import org.dyn4j.dynamics.contact.ContactPoint;
-import org.dyn4j.dynamics.contact.PersistedContactPoint;
-import org.dyn4j.dynamics.contact.SolvedContactPoint;
+import org.dyn4j.dynamics.contact.*;
 import org.dyn4j.geometry.Ray;
 import org.dyn4j.geometry.Vector2;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Physic implements ContactListener, StepListener, FrameListener {
@@ -81,10 +80,22 @@ public class Physic implements ContactListener, StepListener, FrameListener {
 
     @Override
     public void end(Step step, World world) {
-        // überprüfen ob kugeln sich noch bewegen
-        for (Body body : world.getBodies()){
-            body.getLinearVelocity().getMagnitude(); // Magnitude = Größenordnung (wenn Wert 0 --> nichts bewegt sich)
-        }
+        // überprüfen ob Kugeln sich noch bewegen
+//        List<Double> movingObjects = new LinkedList<>();
+//
+//        for (Body body : world.getBodies()) {
+//            double magnitude = body.getLinearVelocity().getMagnitude(); // Magnitude = Größenordnung (wenn Wert 0 --> nichts bewegt sich)
+//            if (magnitude != 0) {
+//                movingObjects.add(magnitude);
+//            }
+//        }
+//        if (movingObjects.size() == 0) {
+//            if (this.renderer.getCurrentPlayer() == 1) {
+//                this.renderer.setCurrentPlayer(2);
+//            } else {
+//                this.renderer.setCurrentPlayer(1);
+//            }
+//        }
     }
 
     @Override
@@ -94,9 +105,6 @@ public class Physic implements ContactListener, StepListener, FrameListener {
 
     @Override
     public boolean begin(ContactPoint point) {
-        //Welche Bodies Kontakt hatten
-        //point.getBody1();
-        //point.getBody2();
         return false;
     }
 
@@ -107,9 +115,18 @@ public class Physic implements ContactListener, StepListener, FrameListener {
 
     @Override
     public boolean persist(PersistedContactPoint point) {
-        if(point.isSensor()){
-            // welcher von den point.getbody ist die Kugel
-            //Prüfen wie wie weit Kugel über Pocket geht --> Überschneiden sie sich deutlich? Dann wird gelocht
+        if (point.isSensor()) {
+            Body ball;
+
+            if (point.getBody1().getUserData() instanceof Ball) {
+                ball = point.getBody1();
+            } else {
+                ball = point.getBody2();
+            }
+
+            if (point.getDepth() >= 0.09) {
+                this.renderer.removeBall((Ball) ball.getUserData());
+            }
         }
         return true;
     }
