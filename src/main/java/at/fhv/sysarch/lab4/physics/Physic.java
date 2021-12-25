@@ -9,7 +9,6 @@ import org.dyn4j.geometry.Ray;
 import org.dyn4j.geometry.Vector2;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import static at.fhv.sysarch.lab4.game.Ball.WHITE;
@@ -57,14 +56,8 @@ public class Physic implements ContactListener, StepListener, FrameListener {
 //                return;
 //            }
 
-            // ToDo: Foul: It is a foul if the white ball does not touch any object ball.
-            if (hitObjectData.getUserData() == null) {
-                this.renderer.setFoulMessage("Foul: The white ball did not touch any object ball.");
-                this.renderer.changeCurrentPlayerScore(-1);
-                this.renderer.changeCurrentPlayer();
-            }
             // Foul: It is a foul if any other ball than the white one is stroke by the cue.
-            else if (!hitObjectData.getUserData().equals(WHITE)) {
+            if (hitObjectData.getUserData() != null && !hitObjectData.getUserData().equals(WHITE)) {
                 this.renderer.setFoulMessage("Foul: Player did not hit the white ball.");
                 this.renderer.changeCurrentPlayerScore(-1);
                 this.renderer.changeCurrentPlayer();
@@ -122,34 +115,41 @@ public class Physic implements ContactListener, StepListener, FrameListener {
     @Override
     public void end(ContactPoint point) {
         this.renderer.setActionMessage(point.getBody1().getUserData() + " touched " + point.getBody2().getUserData());
+
+//        // ToDo: Foul: It is a foul if the white ball does not touch any object ball.
+//        if (point.getBody1().getUserData().equals(WHITE) && !(point.getBody2().getUserData() instanceof Ball)) {
+//            this.renderer.setFoulMessage("Foul: The white ball did not touch any object ball.");
+//            this.renderer.changeCurrentPlayerScore(-1);
+//            this.renderer.changeCurrentPlayer();
+//        }
     }
 
     @Override
     public boolean persist(PersistedContactPoint point) {
         if (point.isSensor()) {
-            Body ball;
-
-            //Prüfen, welcher von den beiden Bodies der Ball ist
-            if (point.getBody1().getUserData() instanceof Ball) {
-                ball = point.getBody1();
-            } else {
-                ball = point.getBody2();
-            }
 
             //Prüfen, um wie viel sich Ball und Pocket überschneiden
             if (point.getDepth() >= 0.09) {
-                this.renderer.removeBall((Ball) ball.getUserData());
-            }
+                Body ball;
 
-            // ToDo: Richtige Position finden
-            // Foul: It is a foul if the white ball is pocketed.
-//            if (ball.getUserData().equals(WHITE)) {
-//                this.renderer.setFoulMessage("Foul: Player pocketed white ball.");
-//                this.renderer.changeCurrentPlayerScore(-1);
-//                this.renderer.changeCurrentPlayer();
-//            } else {
-//                this.renderer.changeCurrentPlayerScore(1);
-//            }
+                //Prüfen, welcher von den beiden Bodies der Ball ist
+                if (point.getBody1().getUserData() instanceof Ball) {
+                    ball = point.getBody1();
+                } else {
+                    ball = point.getBody2();
+                }
+
+                this.renderer.removeBall((Ball) ball.getUserData());
+
+                // ToDo: Foul: It is a foul if the white ball is pocketed.
+//                if (ball.getUserData().equals(WHITE)) {
+//                    this.renderer.setFoulMessage("Foul: Player pocketed white ball.");
+//                    this.renderer.changeCurrentPlayerScore(-1);
+//                    this.renderer.changeCurrentPlayer();
+//                } else {
+//                    this.renderer.changeCurrentPlayerScore(1);
+//                }
+            }
         }
         return true;
     }
