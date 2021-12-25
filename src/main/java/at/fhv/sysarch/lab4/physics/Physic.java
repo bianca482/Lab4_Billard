@@ -9,6 +9,7 @@ import org.dyn4j.geometry.Ray;
 import org.dyn4j.geometry.Vector2;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static at.fhv.sysarch.lab4.game.Ball.WHITE;
@@ -18,6 +19,7 @@ public class Physic implements ContactListener, StepListener, FrameListener {
     private final static int FORCE = 500; //Kraft vorgeben
     private final World world;
     private final Renderer renderer;
+    private boolean alreadySetPoint = false;
 
     public Physic(Renderer renderer) {
         this.world = new World();
@@ -34,6 +36,7 @@ public class Physic implements ContactListener, StepListener, FrameListener {
 
     public void performStrike(double startX, double startY, double endX, double endY) {
         this.renderer.setFoulMessage("");
+        this.alreadySetPoint = false;
 
         Vector2 origin = new Vector2(startX, startY); //Anhand der Koordinaten bestimmen, wo der Stoß stattgefunden hat
         Vector2 direction = origin.difference(endX, endY); //Stoßrichtung berechnen
@@ -91,15 +94,19 @@ public class Physic implements ContactListener, StepListener, FrameListener {
 
     @Override
     public void end(Step step, World world) {
+        LinkedList<Body> movingObjects = new LinkedList<>();
+
         // Überprüfen ob Kugeln sich noch bewegen
-//        List<Double> movingObjects = new LinkedList<>();
-//
-//        for (Body body : world.getBodies()) {
-//            double magnitude = body.getLinearVelocity().getMagnitude(); // Magnitude = Größenordnung (wenn Wert 0 --> nichts bewegt sich)
-//            if (magnitude != 0) {
-//                movingObjects.add(magnitude);
-//            }
-//        }
+        for (Body body : world.getBodies()) {
+            // Magnitude = Größenordnung (wenn Wert 0 --> nichts bewegt sich)
+            double magnitude = body.getLinearVelocity().getMagnitude();
+            if (magnitude != 0) {
+                movingObjects.add(body);
+            }
+        }
+        if (movingObjects.size() == 0) {
+            //Dann bewegt sich nichts mehr
+        }
     }
 
     @Override
@@ -116,7 +123,7 @@ public class Physic implements ContactListener, StepListener, FrameListener {
     public void end(ContactPoint point) {
         this.renderer.setActionMessage(point.getBody1().getUserData() + " touched " + point.getBody2().getUserData());
 
-//        // ToDo: Foul: It is a foul if the white ball does not touch any object ball.
+//        // ToDo: Foul: It is a foul if the white ball does not touch any object ball. An welcher Stelle, damit nur einmal upgedated?
 //        if (point.getBody1().getUserData().equals(WHITE) && !(point.getBody2().getUserData() instanceof Ball)) {
 //            this.renderer.setFoulMessage("Foul: The white ball did not touch any object ball.");
 //            this.renderer.changeCurrentPlayerScore(-1);
@@ -142,13 +149,22 @@ public class Physic implements ContactListener, StepListener, FrameListener {
                 this.renderer.removeBall((Ball) ball.getUserData());
 
                 // ToDo: Foul: It is a foul if the white ball is pocketed.
-//                if (ball.getUserData().equals(WHITE)) {
-//                    this.renderer.setFoulMessage("Foul: Player pocketed white ball.");
-//                    this.renderer.changeCurrentPlayerScore(-1);
-//                    this.renderer.changeCurrentPlayer();
-//                } else {
-//                    this.renderer.changeCurrentPlayerScore(1);
-//                }
+                if (!alreadySetPoint && ball.getUserData().equals(WHITE)) {
+                    alreadySetPoint = true;
+
+                    // Foul registrieren
+                    this.renderer.setFoulMessage("Foul: Player pocketed white ball.");
+                    this.renderer.changeCurrentPlayerScore(-1);
+                    this.renderer.changeCurrentPlayer();
+
+                    // ToDo: Ball neu zeichnen
+                    ((Ball) ball.getUserData()).setPosition(point.getOldPoint().x, point.getOldPoint().y);
+                    this.renderer.addBall((Ball) ball.getUserData());
+                    this.renderer.drawWhiteBall((Ball) ball.getUserData());
+                } else if (!alreadySetPoint && !ball.getUserData().equals(WHITE)) {
+                    alreadySetPoint = true;
+                    this.renderer.changeCurrentPlayerScore(1);
+                }
             }
         }
         return true;

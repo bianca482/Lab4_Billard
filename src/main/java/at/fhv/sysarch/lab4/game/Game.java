@@ -16,6 +16,7 @@ public class Game {
     public Game(Renderer renderer, Physic physic) {
         this.renderer = renderer;
         this.physic = physic;
+
         this.initWorld();
     }
 
