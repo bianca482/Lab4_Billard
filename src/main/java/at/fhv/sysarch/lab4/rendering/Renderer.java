@@ -4,15 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import at.fhv.sysarch.lab4.game.Cue;
+import at.fhv.sysarch.lab4.game.*;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Circle;
 import org.dyn4j.geometry.Polygon;
 import org.dyn4j.geometry.Transform;
 import org.dyn4j.geometry.Vector2;
 
-import at.fhv.sysarch.lab4.game.Ball;
-import at.fhv.sysarch.lab4.game.Table;
 import at.fhv.sysarch.lab4.game.Table.TablePart;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
@@ -25,6 +23,8 @@ public class Renderer extends AnimationTimer {
     private List<Ball> balls;
     private Table table;
     private Cue cue;
+    private Player player1;
+    private Player player2;
 
     private final GraphicsContext gc;
 
@@ -76,7 +76,12 @@ public class Renderer extends AnimationTimer {
 
         this.gc.setStroke(Color.WHITE);
     }
-
+    public void setPlayer1(Player player1) {
+        this.player1 = player1;
+    }
+    public void setPlayer2(Player player2) {
+        this.player2 = player2;
+    }
     public void setStrikeMessage(String strikeMessage) {
         this.strikeMessage = strikeMessage;
     }
@@ -313,16 +318,16 @@ public class Renderer extends AnimationTimer {
         actionMsgTrans.appendTranslation(this.centerX - 250, 200);
         actionMsgTrans.appendScale(2, 2);
 
-        strikeMsgTrans.appendTranslation(this.centerX - 250, 150);
+        strikeMsgTrans.appendTranslation(this.centerX - 250, 50);
         strikeMsgTrans.appendScale(2, 2);
 
         foulMsgTrans.appendTranslation(this.centerX - 250,  this.centerY + 300);
         foulMsgTrans.appendScale(2, 2);
 
-        player1ScoreTrans.appendTranslation(10, this.sceneHeight - 100);
+        player1ScoreTrans.appendTranslation(10, this.sceneHeight -50);
         player1ScoreTrans.appendScale(5, 5);
         
-        player2ScoreTrans.appendTranslation(this.centerX + 300, this.sceneHeight - 100);
+        player2ScoreTrans.appendTranslation(this.centerX + 200, this.sceneHeight - 50);
         player2ScoreTrans.appendScale(5, 5);
 
         this.gc.setTransform(actionMsgTrans);
@@ -335,10 +340,18 @@ public class Renderer extends AnimationTimer {
         this.gc.fillText(this.foulMessage, 0, 0);
 
         this.gc.setTransform(player1ScoreTrans);
-        this.gc.fillText(String.format("Player 1 score: %d", this.player1Score), 0, 0);
+        if(player1.isActivePlayer()){
+            this.gc.fillText(String.format("-> Player 1: %d", this.player1.getScore()), 0, 0);
+        }else{
+            this.gc.fillText(String.format("   Player 1: %d", this.player1.getScore()), 0, 0);
+        }
 
         this.gc.setTransform(player2ScoreTrans);
-        this.gc.fillText(String.format("Player 2 score: %d", this.player2Score), 0, 0);
+        if(player2.isActivePlayer()){
+            this.gc.fillText(String.format("-> Player 2: %d", this.player2.getScore()), 0, 0);
+        }else{
+            this.gc.fillText(String.format("   Player 2: %d", this.player2.getScore()), 0, 0);
+        }
     }
 
     private void renderCushion(Polygon p) {
