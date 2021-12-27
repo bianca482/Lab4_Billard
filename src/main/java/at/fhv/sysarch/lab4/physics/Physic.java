@@ -1,8 +1,9 @@
 package at.fhv.sysarch.lab4.physics;
 
-import at.fhv.sysarch.lab4.game.Ball;
+import at.fhv.sysarch.lab4.game.*;
 import at.fhv.sysarch.lab4.rendering.FrameListener;
 import at.fhv.sysarch.lab4.rendering.Renderer;
+import org.dyn4j.collision.narrowphase.Raycast;
 import org.dyn4j.dynamics.*;
 import org.dyn4j.dynamics.contact.*;
 import org.dyn4j.geometry.Ray;
@@ -14,7 +15,7 @@ import java.util.List;
 
 import static at.fhv.sysarch.lab4.game.Ball.WHITE;
 
-public class Physic implements ContactListener, StepListener, FrameListener {
+public class Physic implements RaycastListener, ContactListener, StepListener, FrameListener {
 
     private final static int FORCE = 500; //Kraft vorgeben
     private final World world;
@@ -178,5 +179,20 @@ public class Physic implements ContactListener, StepListener, FrameListener {
     @Override
     public void postSolve(SolvedContactPoint point) {
 
+    }
+
+    @Override
+    public boolean allow(Ray ray, Body body, BodyFixture fixture) {
+
+        Object userData = body.getUserData();
+        if(userData instanceof Table){
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean allow(Ray ray, Body body, BodyFixture fixture, Raycast raycast) {
+        return true;
     }
 }
