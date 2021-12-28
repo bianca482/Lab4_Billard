@@ -1,4 +1,4 @@
-package at.fhv.sysarch.lab4.physics.listener;
+package at.fhv.sysarch.lab4.logic.listener;
 
 public interface ObjectsRestListener {
     public void onEndAllObjectsRest();
