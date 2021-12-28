@@ -197,8 +197,6 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
                     alreadySetPoint = true;
                     notifyballPocketedListeners(pockedBall);
                 }
-                this.renderer.removeBall(pockedBall);
-
             }
         }
         return true;

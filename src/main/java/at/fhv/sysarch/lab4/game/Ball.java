@@ -6,6 +6,7 @@ import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.MassType;
 
 import javafx.scene.paint.Color;
+import org.dyn4j.geometry.Vector2;
 
 public enum Ball {
     ONE(Color.YELLOW, true),
@@ -27,6 +28,8 @@ public enum Ball {
 
     private Color c;
     private boolean solid;
+    private Vector2 position;
+    private boolean isVisible = true;
 
     private Body body;
 
@@ -39,8 +42,13 @@ public enum Ball {
     }
 
     public void setPosition(double x, double y) {
+        this.position = new Vector2(x,y);
         this.body.translateToOrigin();
         this.body.translate(x, y);
+    }
+
+    public Vector2 getPosition(){
+        return position;
     }
 
     public Circle getShape() {
@@ -98,5 +106,13 @@ public enum Ball {
         // "Most experimental numbers I have seen for the coefficient of restitution
         // for pool balls have been in the range 0.90 to 0.96."
         private final static double RESTITUTION = 0.93;
+    }
+
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public void setVisible(boolean visible) {
+        isVisible = visible;
     }
 }
