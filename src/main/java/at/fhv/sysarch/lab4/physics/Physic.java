@@ -1,7 +1,7 @@
 package at.fhv.sysarch.lab4.physics;
 
 import at.fhv.sysarch.lab4.game.*;
-import at.fhv.sysarch.lab4.physics.listener.*;
+import at.fhv.sysarch.lab4.logic.listener.*;
 import at.fhv.sysarch.lab4.rendering.FrameListener;
 import at.fhv.sysarch.lab4.rendering.Renderer;
 import org.dyn4j.collision.narrowphase.Raycast;
@@ -14,19 +14,25 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static at.fhv.sysarch.lab4.game.Ball.WHITE;
-
 public class Physic implements RaycastListener, ContactListener, StepListener, FrameListener {
 
     private final static int FORCE = 500; //Kraft vorgeben
     private final World world;
     private final Renderer renderer;
-    private boolean alreadySetPoint = false;
+    private boolean ballWasMovingInLastStep = false;
 
-    private List<BallsCollisionListener> ballsCollisionListeners = new LinkedList<>();
-    private List<BallPocketedListener> ballPocketedListeners = new LinkedList<>();
-    private List<BallStrikeListener> ballStrikeListeners = new LinkedList<>();
-    private List<ObjectsRestListener> objectsRestListeners = new LinkedList<>();
+    private final List<BallsCollisionListener> ballsCollisionListeners = new LinkedList<>();
+    private final List<BallPocketedListener> ballPocketedListeners = new LinkedList<>();
+    private final List<BallStrikeListener> ballStrikeListeners = new LinkedList<>();
+    private final List<ObjectsRestListener> objectsRestListeners = new LinkedList<>();
+
+    public Physic(Renderer renderer) {
+        this.world = new World();
+        this.world.setGravity(World.ZERO_GRAVITY);
+        //this.world.getSettings().setStepFrequency(); //Wiederholfrequenz evtl notwendig bei Problemen
+        this.world.addListener(this); //Physics Klasse soll notifiziert werden wenn in der Welt was passiert
+        this.renderer = renderer;
+    }
 
     public void addBallsCollisionListener(BallsCollisionListener ballsCollisionListener) {
         ballsCollisionListeners.add(ballsCollisionListener);
@@ -44,14 +50,6 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
         objectsRestListeners.add(objectsRestListener);
     }
 
-    public Physic(Renderer renderer) {
-        this.world = new World();
-        this.world.setGravity(World.ZERO_GRAVITY);
-        //this.world.getSettings().setStepFrequency(); //Wiederholfrequenz evtl notwendig bei Problemen
-        this.world.addListener(this); //Physics Klasse soll notifiziert werden wenn in der Welt was passiert
-        this.renderer = renderer;
-    }
-
     //Eventuell neues Interface welche diese zusätzlichen Methoden definiert
     public void addBody(Body b) {
         this.world.addBody(b);
@@ -59,7 +57,6 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
 
     public void performStrike(double startX, double startY, double endX, double endY) {
         this.renderer.setFoulMessage("");
-        this.alreadySetPoint = false;
 
         Vector2 origin = new Vector2(startX, startY); //Anhand der Koordinaten bestimmen, wo der Stoß stattgefunden hat
         Vector2 direction = origin.difference(endX, endY); //Stoßrichtung berechnen
@@ -72,24 +69,11 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
         if (hit) {
             // Angestoßenes Objekt
             Body hitObjectData = results.get(0).getBody();
-
-            // Foul: Nothing hit.
-            // Keine UserData? Dann kann es kein Ball sein
-//            if (hitObjectData.getUserData() == null) {
-//                this.renderer.setFoulMessage("Foul: Nothing hit.");
-//                this.renderer.changeCurrentPlayerScore(-1);
-//                this.renderer.changeCurrentPlayer();
-//                return;
-//            }
             Ball ball = (Ball) hitObjectData.getUserData();
+
             notifyBallCueListener(ball);
-            // Foul: It is a foul if any other ball than the white one is stroke by the cue.
-            if (ball != null && !ball.equals(WHITE)) {
-                this.renderer.setFoulMessage("Foul: Player did not hit the white ball.");
-                this.renderer.changeCurrentPlayerScore(-1);
-                this.renderer.changeCurrentPlayer();
-            }
             notifyObjectRestListenerStart();
+
             //Weiße Kugel stoßen
             direction.multiply(FORCE); //Da mit der Direction multipliziert, wird gewirkte Kraft bei größerem Abstand größer
             hitObjectData.applyForce(direction);
@@ -115,8 +99,6 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     public void postSolve(Step step, World world) {
 
     }
-
-    private boolean ballWasMovingInLastStep = false;
 
     @Override
     public void end(Step step, World world) {
@@ -211,24 +193,6 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
                 notifyballPocketedListeners(pockedBall);
 
                 this.renderer.removeBall(pockedBall);
-
-                // TODO: Foul: It is a foul if the white ball is pocketed.
-                if (!alreadySetPoint && ball.getUserData().equals(WHITE)) {
-                    alreadySetPoint = true;
-
-                    // Foul registrieren
-                    this.renderer.setFoulMessage("Foul: Player pocketed white ball.");
-                    this.renderer.changeCurrentPlayerScore(-1);
-                    this.renderer.changeCurrentPlayer();
-
-                    // TODO: Ball neu zeichnen
-                    (pockedBall).setPosition(point.getOldPoint().x, point.getOldPoint().y);
-                    this.renderer.addBall(pockedBall);
-                    this.renderer.drawWhiteBall(pockedBall);
-                } else if (!alreadySetPoint && !ball.getUserData().equals(WHITE)) {
-                    alreadySetPoint = true;
-                    this.renderer.changeCurrentPlayerScore(1);
-                }
             }
         }
         return true;
@@ -246,7 +210,6 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
 
     @Override
     public boolean allow(Ray ray, Body body, BodyFixture fixture) {
-
         Object userData = body.getUserData();
         if (userData instanceof Table) {
             return false;
