@@ -8,7 +8,6 @@ import at.fhv.sysarch.lab4.logic.GameLogic;
 import at.fhv.sysarch.lab4.physics.Physic;
 import at.fhv.sysarch.lab4.rendering.Renderer;
 import javafx.scene.input.MouseEvent;
-import org.dyn4j.geometry.Vector2;
 
 public class Game {
 
@@ -19,12 +18,13 @@ public class Game {
     private final Player player2 = new Player("Player 2");
     private Player activePlayer = player1;
     private Ball whiteBall;
+    private GameLogic gameLogic;
 
     public Game(Renderer renderer, Physic physic) {
         this.renderer = renderer;
         this.physic = physic;
 
-        GameLogic gameLogic = new GameLogic(this, renderer);
+        this.gameLogic = new GameLogic(this, renderer);
         this.physic.addObjectRestListener(gameLogic);
         this.physic.addBallPocketedListener(gameLogic);
         this.physic.addBallsCollisionListener(gameLogic);
@@ -136,6 +136,9 @@ public class Game {
     }
 
     public void onMousePressed(MouseEvent e) {
+        if(gameLogic.isDeactivateUi()){
+            return;
+        }
         double x = e.getX();
         double y = e.getY();
 
@@ -146,6 +149,9 @@ public class Game {
     }
 
     public void onMouseReleased(MouseEvent e) {
+        if(gameLogic.isDeactivateUi()){
+            return;
+        }
         double x = e.getX();
         double y = e.getY();
 
@@ -156,6 +162,9 @@ public class Game {
     }
 
     public void setOnMouseDragged(MouseEvent e) {
+        if(gameLogic.isDeactivateUi()){
+            return;
+        }
         double x = e.getX();
         double y = e.getY();
 
