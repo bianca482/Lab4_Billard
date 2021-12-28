@@ -285,7 +285,7 @@ public class Renderer extends AnimationTimer {
         Affine player1ScoreTrans = new Affine(this.jfxCoords);
         Affine player2ScoreTrans = new Affine(this.jfxCoords);
 
-        actionMsgTrans.appendTranslation(this.centerX - 250, 200);
+        actionMsgTrans.appendTranslation(this.centerX - 250, 100);
         actionMsgTrans.appendScale(2, 2);
 
         strikeMsgTrans.appendTranslation(this.centerX - 250, 50);
