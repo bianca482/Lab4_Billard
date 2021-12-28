@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import at.fhv.sysarch.lab4.logic.GameLogic;
 import at.fhv.sysarch.lab4.physics.Physic;
 import at.fhv.sysarch.lab4.rendering.Renderer;
 import javafx.scene.input.MouseEvent;
@@ -11,11 +12,31 @@ import org.dyn4j.geometry.Vector2;
 
 public class Game {
 
-    private Player player1 = new Player("Player 1");
-    private Player player2 = new Player("Player 2");
+    private final Renderer renderer;
+    private final Physic physic;
+    private Cue cue;
+    private final Player player1 = new Player("Player 1");
+    private final Player player2 = new Player("Player 2");
     private Player activePlayer = player1;
     private Ball whiteBall;
     private Vector2 whiteBallLastPosition;
+
+    public Game(Renderer renderer, Physic physic) {
+        this.renderer = renderer;
+        this.physic = physic;
+
+        GameLogic gameLogic = new GameLogic(this);
+        this.physic.addObjectRestListener(gameLogic);
+        this.physic.addBallPocketedListener(gameLogic);
+        this.physic.addBallsCollisionListener(gameLogic);
+        this.physic.addBallStrikeListener(gameLogic);
+
+        this.renderer.setPlayer1(player1);
+        this.renderer.setPlayer2(player2);
+        player1.setActivePlayer(true);
+
+        this.initWorld();
+    }
 
     public Player getActivePlayer() {
         return activePlayer;
@@ -41,8 +62,6 @@ public class Game {
         }
     }
 
-    private final Renderer renderer;
-
     protected Renderer getRenderer() {
         return renderer;
     }
@@ -51,29 +70,9 @@ public class Game {
         return physic;
     }
 
-    private final Physic physic;
-
     protected Cue getCue() {
         return cue;
     }
-
-    private Cue cue;
-
-    public Game(Renderer renderer, Physic physic) {
-        this.renderer = renderer;
-        this.physic = physic;
-        GameLogic gameLogic = new GameLogic(this);
-        this.physic.addObjectRestListener(gameLogic);
-        this.physic.addBallPocketedListener(gameLogic);
-        this.physic.addBallsCollisionListener(gameLogic);
-        this.physic.addBallStrikeListener(gameLogic);
-        this.renderer.setPlayer1(player1);
-        this.renderer.setPlayer2(player2);
-        player1.setActivePlayer(true);
-
-        this.initWorld();
-    }
-
 
     private void placeBalls(List<Ball> balls) {
         Collections.shuffle(balls);
