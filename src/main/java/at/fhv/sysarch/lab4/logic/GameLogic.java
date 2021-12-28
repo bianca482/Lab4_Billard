@@ -1,26 +1,31 @@
-package at.fhv.sysarch.lab4.game;
+package at.fhv.sysarch.lab4.logic;
 
-import at.fhv.sysarch.lab4.physics.listener.BallStrikeListener;
-import at.fhv.sysarch.lab4.physics.listener.BallPocketedListener;
-import at.fhv.sysarch.lab4.physics.listener.BallsCollisionListener;
-import at.fhv.sysarch.lab4.physics.listener.ObjectsRestListener;
+import at.fhv.sysarch.lab4.game.Ball;
+import at.fhv.sysarch.lab4.game.Game;
+import at.fhv.sysarch.lab4.logic.listener.BallStrikeListener;
+import at.fhv.sysarch.lab4.logic.listener.BallPocketedListener;
+import at.fhv.sysarch.lab4.logic.listener.BallsCollisionListener;
+import at.fhv.sysarch.lab4.logic.listener.ObjectsRestListener;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-// Irgendwie sollen wir noch die Interfaces verwenden --> aber wie?
-// Im Sinne von Spiellogik getrennt in einer Klasse halten/ Physic Klasse entlasten? (Prüfen ob Regeln verletzt etc.)
-// Oder soll Physic auch diese Methoden implementieren?
+import static at.fhv.sysarch.lab4.game.Ball.WHITE;
+
 public class GameLogic implements BallStrikeListener, BallPocketedListener, BallsCollisionListener, ObjectsRestListener {
 
     private Game game;
     private Ball ballTouchedByCue;
     private List<Ball> contactedBalls = new LinkedList<>();
     private Set<Ball> pocketBalls = new HashSet<>();
-    List<String> fouls = new LinkedList<>();
+    private List<String> fouls = new LinkedList<>();
     private boolean deactivateUi = false;
+
+    public GameLogic(Game game) {
+        this.game = game;
+    }
 
     public boolean isDeactivateUi() {
         return deactivateUi;
@@ -30,20 +35,20 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
         this.deactivateUi = deactivateUi;
     }
 
-
-    public GameLogic(Game game) {
-        this.game = game;
-    }
-
     @Override
     public void onBallStrike(Ball b) {
+        // Foul: It is a foul if any other ball than the white one is stroke by the cue.
+        if (b != null && !b.equals(WHITE)) {
+            fouls.add("Player did not hit the white ball.");
+        }
         ballTouchedByCue = b;
     }
 
     @Override
     public boolean onBallPocketed(Ball b) {
         pocketBalls.add(b);
-        if(b.isWhite()){
+        // Foul: It is a foul if the white ball is pocketed.
+        if (b.isWhite()) {
             fouls.add("White Ball is in pocket");
         }
         //TODO return
@@ -52,9 +57,9 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
 
     @Override
     public void onBallsCollide(Ball b1, Ball b2) {
-        if(b1 == ballTouchedByCue){
+        if (b1 == ballTouchedByCue) {
             contactedBalls.add(b2);
-        }else{
+        } else {
             contactedBalls.add(b1);
         }
     }
@@ -62,18 +67,18 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
     @Override
     public void onEndAllObjectsRest() {
         // kein Ball bewegt sich mehr. Punkte zählen und nächsten Spieler auswählen
-        if(contactedBalls.size() == 0){
+        if (contactedBalls.size() == 0) {
             // Foul: It is a foul if the white ball does not touch any object ball.
-            fouls.add("No other balls was touched");
+            fouls.add("White ball did not touch any object ball.");
         }
 
-        if(fouls.size() != 0){
+        if (fouls.size() != 0) {
             game.getActivePlayer().addScore(-1);
             game.switchPlayer();
             for (String foul : fouls) {
-                System.out.println("Foul: "+foul);
+                System.out.println("Foul: " + foul);
             }
-        }else{
+        } else {
             int score = pocketBalls.size();
             game.getActivePlayer().addScore(score);
         }
@@ -88,5 +93,4 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
         fouls = new LinkedList<>();
         deactivateUi = true;
     }
-
 }
