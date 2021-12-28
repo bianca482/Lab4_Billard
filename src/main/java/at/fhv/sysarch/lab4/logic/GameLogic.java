@@ -45,6 +45,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
 
     @Override
     public void onBallStrike(Ball b) {
+        this.renderer.setFoulMessage("");
         // Foul: It is a foul if any other ball than the white one is stroke by the cue.
         if (!b.equals(WHITE)) {
             fouls.add("Player did not hit the white ball.");
@@ -91,9 +92,11 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
             }
 
             renderer.setFoulMessage(allFouls.toString());
+            renderer.setActionMessage(game.getActivePlayer().getName() + " commited a foul, switching players.");
         } else {
             int score = pocketBalls.size();
             game.getActivePlayer().addScore(score);
+            renderer.setActionMessage(game.getActivePlayer().getName() + " pocketed " + score + " balls.");
         }
 
         if(pocketBalls.contains(this.game.getWhiteBall())){

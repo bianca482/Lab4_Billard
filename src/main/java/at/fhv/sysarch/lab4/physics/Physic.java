@@ -59,7 +59,6 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     }
 
     public void performStrike(double startX, double startY, double endX, double endY) {
-        this.renderer.setFoulMessage("");
         alreadySetPoint = false;
 
         Vector2 origin = new Vector2(startX, startY); //Anhand der Koordinaten bestimmen, wo der Stoß stattgefunden hat
@@ -170,8 +169,6 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
 
     @Override
     public void end(ContactPoint point) {
-        this.renderer.setActionMessage(point.getBody1().getUserData() + " touched " + point.getBody2().getUserData());
-
         if (point.getBody1().getUserData() instanceof Ball && point.getBody2().getUserData() instanceof Ball) {
             Ball ball1 = (Ball) point.getBody1().getUserData();
             Ball ball2 = (Ball) point.getBody2().getUserData();
