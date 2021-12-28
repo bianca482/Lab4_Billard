@@ -96,7 +96,16 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
         } else {
             int score = pocketBalls.size();
             game.getActivePlayer().addScore(score);
-            renderer.setActionMessage(game.getActivePlayer().getName() + " pocketed " + score + " balls.");
+            if (score == 0) {
+                renderer.setActionMessage(game.getActivePlayer().getName() + " did not pocket any balls.");
+            } else {
+                StringBuilder allPocketedBalls = new StringBuilder();
+
+                for (Ball ball : pocketBalls) {
+                    allPocketedBalls.append(ball.getBody().getUserData()).append("\n");
+                }
+                renderer.setActionMessage(game.getActivePlayer().getName() + " pocketed the following balls: " + allPocketedBalls);
+            }
         }
 
         if(pocketBalls.contains(this.game.getWhiteBall())){
