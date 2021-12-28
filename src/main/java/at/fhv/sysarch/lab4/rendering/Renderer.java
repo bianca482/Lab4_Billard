@@ -45,9 +45,6 @@ public class Renderer extends AnimationTimer {
     private String strikeMessage;
     private String foulMessage;
     private String actionMessage;
-    private int currentPlayer;
-    private int player1Score;
-    private int player2Score;
 
     private Optional<FrameListener> frameListener;
 
@@ -94,18 +91,6 @@ public class Renderer extends AnimationTimer {
         this.foulMessage = foulMessage;
     }
 
-    public void setPlayer1Score(int player1Score) {
-        this.player1Score = player1Score;
-    }
-
-    public void setPlayer2Score(int player2Score) {
-        this.player2Score = player2Score;
-    }
-
-    public void setCurrentPlayer(int currentPlayer) { this.currentPlayer = currentPlayer; }
-
-    public int getCurrentPlayer() { return currentPlayer; }
-
     public void addBall(Ball b) {
         this.balls.add(b);
     }
@@ -143,22 +128,6 @@ public class Renderer extends AnimationTimer {
 
         this.gc.setFill(b.getColor());
         this.gc.fillOval(-r, -r, d, d);
-    }
-
-    public void changeCurrentPlayer() {
-        if (this.currentPlayer == 1) {
-            this.currentPlayer = 2;
-        } else {
-            this.currentPlayer = 1;
-        }
-    }
-
-    public void changeCurrentPlayerScore(int value) {
-        if (this.currentPlayer == 1) {
-            this.player1Score += value;
-        } else {
-            this.player2Score += value;
-        }
     }
 
     public double screenToPhysicsX(double screenX) {
@@ -334,22 +303,26 @@ public class Renderer extends AnimationTimer {
         this.gc.fillText(this.actionMessage, 0, 0);
 
         this.gc.setTransform(strikeMsgTrans);
-        this.gc.fillText(String.format("%s %d", this.strikeMessage, this.currentPlayer), 0, 0);
+        if (player1.isActivePlayer()) {
+            this.gc.fillText(String.format("%s %s", this.strikeMessage, this.player1.getName()), 0, 0);
+        } else {
+            this.gc.fillText(String.format("%s %s", this.strikeMessage, this.player2.getName()), 0, 0);
+        }
 
         this.gc.setTransform(foulMsgTrans);
         this.gc.fillText(this.foulMessage, 0, 0);
 
         this.gc.setTransform(player1ScoreTrans);
-        if(player1.isActivePlayer()){
+        if (player1.isActivePlayer()) {
             this.gc.fillText(String.format("-> Player 1 score: %d", this.player1.getScore()), 0, 0);
-        }else{
+        } else {
             this.gc.fillText(String.format("   Player 1 score: %d", this.player1.getScore()), 0, 0);
         }
 
         this.gc.setTransform(player2ScoreTrans);
-        if(player2.isActivePlayer()){
+        if (player2.isActivePlayer()) {
             this.gc.fillText(String.format("-> Player 2 score: %d", this.player2.getScore()), 0, 0);
-        }else{
+        } else{
             this.gc.fillText(String.format("   Player 2 score: %d", this.player2.getScore()), 0, 0);
         }
     }
