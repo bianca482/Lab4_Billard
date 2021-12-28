@@ -314,18 +314,9 @@ public class Renderer extends AnimationTimer {
         this.gc.fillText(this.foulMessage, 0, 0);
 
         this.gc.setTransform(player1ScoreTrans);
-        if (player1.isActivePlayer()) {
-            this.gc.fillText(String.format("-> Player 1 score: %d", this.player1.getScore()), 0, 0);
-        } else {
-            this.gc.fillText(String.format("   Player 1 score: %d", this.player1.getScore()), 0, 0);
-        }
-
+        this.gc.fillText(String.format("   Player 1 score: %d", this.player1.getScore()), 0, 0);
         this.gc.setTransform(player2ScoreTrans);
-        if (player2.isActivePlayer()) {
-            this.gc.fillText(String.format("-> Player 2 score: %d", this.player2.getScore()), 0, 0);
-        } else{
-            this.gc.fillText(String.format("   Player 2 score: %d", this.player2.getScore()), 0, 0);
-        }
+        this.gc.fillText(String.format("   Player 2 score: %d", this.player2.getScore()), 0, 0);
     }
 
     private void renderCushion(Polygon p) {
