@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static at.fhv.sysarch.lab4.game.Ball.WHITE;
-
 public class Physic implements RaycastListener, ContactListener, StepListener, FrameListener {
 
     private final static int FORCE = 500; //Kraft vorgeben
