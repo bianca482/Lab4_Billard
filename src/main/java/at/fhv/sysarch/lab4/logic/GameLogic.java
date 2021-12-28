@@ -26,6 +26,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
     private boolean deactivateUi = false;
     private final Renderer renderer;
     private Vector2 whiteBallStartPosition;
+    private Vector2 whiteBallOldPosition;
 
     public GameLogic(Game game, Renderer renderer) {
         this.game = game;
@@ -44,12 +45,13 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
     }
 
     @Override
-    public void onBallStrike(Ball b) {
+    public void onBallStrike(Ball b, Vector2 oldPosition) {
         this.renderer.setFoulMessage("");
         // Foul: It is a foul if any other ball than the white one is stroke by the cue.
         if (!b.equals(WHITE)) {
             fouls.add("Player did not hit the white ball.");
         }
+        whiteBallOldPosition = oldPosition;
         ballTouchedByCue = b;
     }
 
@@ -110,12 +112,19 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
         }
 
         if(pocketBalls.contains(this.game.getWhiteBall())){
-            this.game.getWhiteBall().setPosition(whiteBallStartPosition.x,whiteBallStartPosition.y);
+            this.game.getWhiteBall().setPosition(whiteBallOldPosition.x,whiteBallOldPosition.y);
             this.game.getWhiteBall().setVisible(true);
         }
 
         deactivateUi = false;
 
+
+        // ToDo:
+        /*
+        After the 14th ball is pocketed, the 14 balls are put back on the table with the top spot left
+        free. The current player can then continue either by playing the 15th ball or any other balls
+        in the rack. This continues forever.
+         */
     }
 
     @Override

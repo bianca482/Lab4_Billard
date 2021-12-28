@@ -71,7 +71,8 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
             Body hitObjectData = results.get(0).getBody();
             Ball ball = (Ball) hitObjectData.getUserData();
 
-            notifyBallCueListener(ball);
+            // ToDo: Kugel an die Position setzen, bevor die weiße Kugel versenkt wurde
+            notifyBallCueListener(ball, ball.getPosition());
 
             //Weiße Kugel stoßen
             direction.multiply(FORCE); //Da mit der Direction multipliziert, wird gewirkte Kraft bei größerem Abstand größer
@@ -121,7 +122,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
         }
     }
 
-    private void notifyballPocketedListeners(Ball ball) {
+    private void notifyBallPocketedListeners(Ball ball) {
         for (BallPocketedListener ballPocketedListener : ballPocketedListeners) {
             ballPocketedListener.onBallPocketed(ball);
         }
@@ -133,9 +134,9 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
         }
     }
 
-    private void notifyBallCueListener(Ball ball) {
+    private void notifyBallCueListener(Ball ball, Vector2 oldPosition) {
         for (BallStrikeListener ballStrikeListener : ballStrikeListeners) {
-            ballStrikeListener.onBallStrike(ball);
+            ballStrikeListener.onBallStrike(ball, oldPosition);
         }
     }
 
@@ -190,7 +191,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
 
                 if (!alreadySetPoint) {
                     alreadySetPoint = true;
-                    notifyballPocketedListeners(pockedBall);
+                    notifyBallPocketedListeners(pockedBall);
                 }
             }
         }
