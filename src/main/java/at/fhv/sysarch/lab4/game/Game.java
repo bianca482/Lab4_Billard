@@ -19,7 +19,6 @@ public class Game {
     private final Player player2 = new Player("Player 2");
     private Player activePlayer = player1;
     private Ball whiteBall;
-    private Vector2 whiteBallLastPosition;
 
     public Game(Renderer renderer, Physic physic) {
         this.renderer = renderer;
@@ -48,6 +47,10 @@ public class Game {
 
     public Player getPlayer2() {
         return player2;
+    }
+
+    public Ball getWhiteBall() {
+        return whiteBall;
     }
 
     public void switchPlayer() {

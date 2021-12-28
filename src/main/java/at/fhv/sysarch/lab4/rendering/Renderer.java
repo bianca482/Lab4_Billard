@@ -95,10 +95,6 @@ public class Renderer extends AnimationTimer {
         this.balls.add(b);
     }
 
-    public void removeBall(Ball b) {
-        this.balls.remove(b);
-    }
-    
     public void setTable(Table t) {
         this.table = t;
     }
@@ -205,6 +201,11 @@ public class Renderer extends AnimationTimer {
 
         // render billard balls after table, so they appear on top
         for (Ball b : this.balls) {
+            if(!b.isVisible()){
+                // continue with the next element in the list
+                continue;
+            }
+
             Transform t = b.getBody().getTransform();
             Circle s = b.getShape();
 

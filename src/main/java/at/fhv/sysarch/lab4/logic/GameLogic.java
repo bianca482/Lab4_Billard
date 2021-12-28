@@ -7,6 +7,7 @@ import at.fhv.sysarch.lab4.logic.listener.BallPocketedListener;
 import at.fhv.sysarch.lab4.logic.listener.BallsCollisionListener;
 import at.fhv.sysarch.lab4.logic.listener.ObjectsRestListener;
 import at.fhv.sysarch.lab4.rendering.Renderer;
+import org.dyn4j.geometry.Vector2;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -24,6 +25,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
     private List<String> fouls;
     private boolean deactivateUi = false;
     private final Renderer renderer;
+    private Vector2 whiteBallStartPosition;
 
     public GameLogic(Game game, Renderer renderer) {
         this.game = game;
@@ -57,7 +59,8 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
         if (b.isWhite()) {
             fouls.add("White Ball is in pocket.");
         }
-        //TODO return
+        b.setVisible(false);
+
         return false;
     }
 
@@ -92,6 +95,12 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
             int score = pocketBalls.size();
             game.getActivePlayer().addScore(score);
         }
+
+        if(pocketBalls.contains(this.game.getWhiteBall())){
+            this.game.getWhiteBall().setPosition(whiteBallStartPosition.x,whiteBallStartPosition.y);
+            this.game.getWhiteBall().setVisible(true);
+        }
+
         deactivateUi = false;
 
     }
@@ -102,5 +111,6 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
         pocketBalls = new HashSet<>();
         fouls = new LinkedList<>();
         deactivateUi = true;
+        whiteBallStartPosition = this.game.getWhiteBall().getPosition();
     }
 }
