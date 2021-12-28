@@ -25,7 +25,7 @@ public class Game {
         this.renderer = renderer;
         this.physic = physic;
 
-        GameLogic gameLogic = new GameLogic(this);
+        GameLogic gameLogic = new GameLogic(this, renderer);
         this.physic.addObjectRestListener(gameLogic);
         this.physic.addBallPocketedListener(gameLogic);
         this.physic.addBallsCollisionListener(gameLogic);
@@ -51,7 +51,7 @@ public class Game {
     }
 
     public void switchPlayer() {
-        if (activePlayer == null || activePlayer == player2) {
+        if (activePlayer == null || activePlayer.equals(player2)) {
             activePlayer = player1;
             activePlayer.setActivePlayer(true);
             player2.setActivePlayer(false);

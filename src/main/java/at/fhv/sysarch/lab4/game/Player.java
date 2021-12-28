@@ -23,7 +23,7 @@ public class Player {
     }
 
     public void addScore(int points){
-        this.score = score + points;
+        this.score += points;
     }
 
     public String getName(){

@@ -6,6 +6,7 @@ import at.fhv.sysarch.lab4.logic.listener.BallStrikeListener;
 import at.fhv.sysarch.lab4.logic.listener.BallPocketedListener;
 import at.fhv.sysarch.lab4.logic.listener.BallsCollisionListener;
 import at.fhv.sysarch.lab4.logic.listener.ObjectsRestListener;
+import at.fhv.sysarch.lab4.rendering.Renderer;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -18,13 +19,18 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
 
     private Game game;
     private Ball ballTouchedByCue;
-    private List<Ball> contactedBalls = new LinkedList<>();
-    private Set<Ball> pocketBalls = new HashSet<>();
-    private List<String> fouls = new LinkedList<>();
+    private List<Ball> contactedBalls;
+    private Set<Ball> pocketBalls;
+    private List<String> fouls;
     private boolean deactivateUi = false;
+    private final Renderer renderer;
 
-    public GameLogic(Game game) {
+    public GameLogic(Game game, Renderer renderer) {
         this.game = game;
+        this.renderer = renderer;
+        fouls = new LinkedList<>();
+        pocketBalls = new HashSet<>();
+        contactedBalls = new LinkedList<>();
     }
 
     public boolean isDeactivateUi() {
@@ -38,7 +44,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
     @Override
     public void onBallStrike(Ball b) {
         // Foul: It is a foul if any other ball than the white one is stroke by the cue.
-        if (b != null && !b.equals(WHITE)) {
+        if (!b.equals(WHITE)) {
             fouls.add("Player did not hit the white ball.");
         }
         ballTouchedByCue = b;
@@ -49,7 +55,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
         pocketBalls.add(b);
         // Foul: It is a foul if the white ball is pocketed.
         if (b.isWhite()) {
-            fouls.add("White Ball is in pocket");
+            fouls.add("White Ball is in pocket.");
         }
         //TODO return
         return false;
@@ -57,7 +63,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
 
     @Override
     public void onBallsCollide(Ball b1, Ball b2) {
-        if (b1 == ballTouchedByCue) {
+        if (b1.equals(ballTouchedByCue)) {
             contactedBalls.add(b2);
         } else {
             contactedBalls.add(b1);
@@ -66,7 +72,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
 
     @Override
     public void onEndAllObjectsRest() {
-        // kein Ball bewegt sich mehr. Punkte zählen und nächsten Spieler auswählen
+        // Kein Ball bewegt sich mehr. Punkte zählen und nächsten Spieler auswählen
         if (contactedBalls.size() == 0) {
             // Foul: It is a foul if the white ball does not touch any object ball.
             fouls.add("White ball did not touch any object ball.");
@@ -75,9 +81,13 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
         if (fouls.size() != 0) {
             game.getActivePlayer().addScore(-1);
             game.switchPlayer();
+            StringBuilder allFouls = new StringBuilder();
+
             for (String foul : fouls) {
-                System.out.println("Foul: " + foul);
+                allFouls.append(foul).append("\n");
             }
+
+            renderer.setFoulMessage(allFouls.toString());
         } else {
             int score = pocketBalls.size();
             game.getActivePlayer().addScore(score);

@@ -14,12 +14,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import static at.fhv.sysarch.lab4.game.Ball.WHITE;
+
 public class Physic implements RaycastListener, ContactListener, StepListener, FrameListener {
 
     private final static int FORCE = 500; //Kraft vorgeben
     private final World world;
     private final Renderer renderer;
     private boolean ballWasMovingInLastStep = false;
+    private boolean alreadySetPoint = false;
 
     private final List<BallsCollisionListener> ballsCollisionListeners = new LinkedList<>();
     private final List<BallPocketedListener> ballPocketedListeners = new LinkedList<>();
@@ -57,6 +60,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
 
     public void performStrike(double startX, double startY, double endX, double endY) {
         this.renderer.setFoulMessage("");
+        alreadySetPoint = false;
 
         Vector2 origin = new Vector2(startX, startY); //Anhand der Koordinaten bestimmen, wo der Stoß stattgefunden hat
         Vector2 direction = origin.difference(endX, endY); //Stoßrichtung berechnen
@@ -67,12 +71,13 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
         boolean hit = this.world.raycast(ray, 0, true, false, results); // prüfen ob was getroffen wurde und wenn ja, was getroffen wurde (=results)
 
         if (hit) {
+            notifyObjectRestListenerStart();
+
             // Angestoßenes Objekt
             Body hitObjectData = results.get(0).getBody();
             Ball ball = (Ball) hitObjectData.getUserData();
 
             notifyBallCueListener(ball);
-            notifyObjectRestListenerStart();
 
             //Weiße Kugel stoßen
             direction.multiply(FORCE); //Da mit der Direction multipliziert, wird gewirkte Kraft bei größerem Abstand größer
@@ -190,9 +195,13 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
                 }
 
                 Ball pockedBall = (Ball) ball.getUserData();
-                notifyballPocketedListeners(pockedBall);
 
+                if (!alreadySetPoint) {
+                    alreadySetPoint = true;
+                    notifyballPocketedListeners(pockedBall);
+                }
                 this.renderer.removeBall(pockedBall);
+
             }
         }
         return true;
