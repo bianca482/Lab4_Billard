@@ -27,7 +27,7 @@ public class Main extends Application {
             SCENE_WIDTH, 
             SCENE_HEIGHT);
 
-        Physic physic = new Physic(renderer);
+        Physic physic = new Physic();
         renderer.setFrameListener(physic);
         renderer.setStrikeMessage("Next Strike: ");
 

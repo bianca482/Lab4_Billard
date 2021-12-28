@@ -3,7 +3,6 @@ package at.fhv.sysarch.lab4.physics;
 import at.fhv.sysarch.lab4.game.*;
 import at.fhv.sysarch.lab4.logic.listener.*;
 import at.fhv.sysarch.lab4.rendering.FrameListener;
-import at.fhv.sysarch.lab4.rendering.Renderer;
 import org.dyn4j.collision.narrowphase.Raycast;
 import org.dyn4j.dynamics.*;
 import org.dyn4j.dynamics.contact.*;
@@ -18,7 +17,6 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
 
     private final static int FORCE = 500; //Kraft vorgeben
     private final World world;
-    private final Renderer renderer;
     private boolean ballWasMovingInLastStep = false;
     private boolean alreadySetPoint = false;
 
@@ -27,12 +25,11 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     private final List<BallStrikeListener> ballStrikeListeners = new LinkedList<>();
     private final List<ObjectsRestListener> objectsRestListeners = new LinkedList<>();
 
-    public Physic(Renderer renderer) {
+    public Physic() {
         this.world = new World();
         this.world.setGravity(World.ZERO_GRAVITY);
         //this.world.getSettings().setStepFrequency(); //Wiederholfrequenz evtl notwendig bei Problemen
         this.world.addListener(this); //Physics Klasse soll notifiziert werden wenn in der Welt was passiert
-        this.renderer = renderer;
     }
 
     public void addBallsCollisionListener(BallsCollisionListener ballsCollisionListener) {
@@ -179,7 +176,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
         if (point.isSensor()) {
 
             //Prüfen, um wie viel sich Ball und Pocket überschneiden
-            if (point.getDepth() >= 0.09) {
+            if (point.getDepth() >= 0.08) {
                 Body ball;
 
                 //Prüfen, welcher von den beiden Bodies der Ball ist
