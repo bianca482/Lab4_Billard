@@ -1,6 +1,7 @@
 package at.fhv.sysarch.lab4.physics;
 
 import at.fhv.sysarch.lab4.game.*;
+import at.fhv.sysarch.lab4.physics.listener.*;
 import at.fhv.sysarch.lab4.rendering.FrameListener;
 import at.fhv.sysarch.lab4.rendering.Renderer;
 import org.dyn4j.collision.narrowphase.Raycast;
@@ -22,6 +23,27 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     private final Renderer renderer;
     private boolean alreadySetPoint = false;
 
+    private List<BallsCollisionListener> ballsCollisionListeners = new LinkedList<>();
+    private List<BallPocketedListener> ballPocketedListeners = new LinkedList<>();
+    private List<BallStrikeListener> ballStrikeListeners = new LinkedList<>();
+    private List<ObjectsRestListener> objectsRestListeners = new LinkedList<>();
+
+    public void addBallsCollisionListener(BallsCollisionListener ballsCollisionListener) {
+        ballsCollisionListeners.add(ballsCollisionListener);
+    }
+
+    public void addBallPocketedListener(BallPocketedListener ballPocketedListener) {
+        ballPocketedListeners.add(ballPocketedListener);
+    }
+
+    public void addBallStrikeListener(BallStrikeListener ballStrikeListener) {
+        ballStrikeListeners.add(ballStrikeListener);
+    }
+
+    public void addObjectRestListener(ObjectsRestListener objectsRestListener) {
+        objectsRestListeners.add(objectsRestListener);
+    }
+
     public Physic(Renderer renderer) {
         this.world = new World();
         this.world.setGravity(World.ZERO_GRAVITY);
@@ -31,7 +53,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     }
 
     //Eventuell neues Interface welche diese zusätzlichen Methoden definiert
-    public void addBody(Body b){
+    public void addBody(Body b) {
         this.world.addBody(b);
     }
 
@@ -59,14 +81,15 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
 //                this.renderer.changeCurrentPlayer();
 //                return;
 //            }
-
+            Ball ball = (Ball) hitObjectData.getUserData();
+            notifyBallCueListener(ball);
             // Foul: It is a foul if any other ball than the white one is stroke by the cue.
-            if (hitObjectData.getUserData() != null && !hitObjectData.getUserData().equals(WHITE)) {
+            if (ball != null && !ball.equals(WHITE)) {
                 this.renderer.setFoulMessage("Foul: Player did not hit the white ball.");
                 this.renderer.changeCurrentPlayerScore(-1);
                 this.renderer.changeCurrentPlayer();
             }
-
+            notifyObjectRestListenerStart();
             //Weiße Kugel stoßen
             direction.multiply(FORCE); //Da mit der Direction multipliziert, wird gewirkte Kraft bei größerem Abstand größer
             hitObjectData.applyForce(direction);
@@ -93,6 +116,8 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
 
     }
 
+    private boolean ballWasMovingInLastStep = false;
+
     @Override
     public void end(Step step, World world) {
         LinkedList<Body> movingObjects = new LinkedList<>();
@@ -105,10 +130,46 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
                 movingObjects.add(body);
             }
         }
-        if (movingObjects.size() == 0) {
-            //Dann bewegt sich nichts mehr
+        boolean ballIsMoving = (movingObjects.size() != 0);
+        if (ballWasMovingInLastStep != ballIsMoving) {
+            // Bälle bewegen sich nun, oder bewegen sich nun nicht mehr
+            ballWasMovingInLastStep = ballIsMoving;
+            if (!ballIsMoving) {
+                notifyObjectRestListenerEnd();
+            }
         }
     }
+
+    private void notifyballPocketedListeners(Ball ball) {
+        for (BallPocketedListener ballPocketedListener : ballPocketedListeners) {
+            ballPocketedListener.onBallPocketed(ball);
+        }
+    }
+
+    private void notifyBallsCollisionListeners(Ball ball1, Ball ball2) {
+        for (BallsCollisionListener ballsCollisionListener : ballsCollisionListeners) {
+            ballsCollisionListener.onBallsCollide(ball1, ball2);
+        }
+    }
+
+    private void notifyBallCueListener(Ball ball) {
+        for (BallStrikeListener ballStrikeListener : ballStrikeListeners) {
+            ballStrikeListener.onBallStrike(ball);
+        }
+    }
+
+    private void notifyObjectRestListenerEnd() {
+        for (ObjectsRestListener objectsRestListener : objectsRestListeners) {
+            objectsRestListener.onEndAllObjectsRest();
+        }
+    }
+
+    private void notifyObjectRestListenerStart() {
+        for (ObjectsRestListener objectsRestListener : objectsRestListeners) {
+            objectsRestListener.onStartAllObjectsRest();
+        }
+    }
+
 
     @Override
     public void sensed(ContactPoint point) {
@@ -124,12 +185,11 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     public void end(ContactPoint point) {
         this.renderer.setActionMessage(point.getBody1().getUserData() + " touched " + point.getBody2().getUserData());
 
-//        // ToDo: Foul: It is a foul if the white ball does not touch any object ball. An welcher Stelle, damit nur einmal upgedated?
-//        if (point.getBody1().getUserData().equals(WHITE) && !(point.getBody2().getUserData() instanceof Ball)) {
-//            this.renderer.setFoulMessage("Foul: The white ball did not touch any object ball.");
-//            this.renderer.changeCurrentPlayerScore(-1);
-//            this.renderer.changeCurrentPlayer();
-//        }
+        if (point.getBody1().getUserData() instanceof Ball && point.getBody2().getUserData() instanceof Ball) {
+            Ball ball1 = (Ball) point.getBody1().getUserData();
+            Ball ball2 = (Ball) point.getBody2().getUserData();
+            notifyBallsCollisionListeners(ball1, ball2);
+        }
     }
 
     @Override
@@ -147,9 +207,12 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
                     ball = point.getBody2();
                 }
 
-                this.renderer.removeBall((Ball) ball.getUserData());
+                Ball pockedBall = (Ball) ball.getUserData();
+                notifyballPocketedListeners(pockedBall);
 
-                // ToDo: Foul: It is a foul if the white ball is pocketed.
+                this.renderer.removeBall(pockedBall);
+
+                // TODO: Foul: It is a foul if the white ball is pocketed.
                 if (!alreadySetPoint && ball.getUserData().equals(WHITE)) {
                     alreadySetPoint = true;
 
@@ -158,10 +221,10 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
                     this.renderer.changeCurrentPlayerScore(-1);
                     this.renderer.changeCurrentPlayer();
 
-                    // ToDo: Ball neu zeichnen
-                    ((Ball) ball.getUserData()).setPosition(point.getOldPoint().x, point.getOldPoint().y);
-                    this.renderer.addBall((Ball) ball.getUserData());
-                    this.renderer.drawWhiteBall((Ball) ball.getUserData());
+                    // TODO: Ball neu zeichnen
+                    (pockedBall).setPosition(point.getOldPoint().x, point.getOldPoint().y);
+                    this.renderer.addBall(pockedBall);
+                    this.renderer.drawWhiteBall(pockedBall);
                 } else if (!alreadySetPoint && !ball.getUserData().equals(WHITE)) {
                     alreadySetPoint = true;
                     this.renderer.changeCurrentPlayerScore(1);
@@ -185,7 +248,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     public boolean allow(Ray ray, Body body, BodyFixture fixture) {
 
         Object userData = body.getUserData();
-        if(userData instanceof Table){
+        if (userData instanceof Table) {
             return false;
         }
         return true;
