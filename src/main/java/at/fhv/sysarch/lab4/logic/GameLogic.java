@@ -18,11 +18,11 @@ import static at.fhv.sysarch.lab4.game.Ball.WHITE;
 
 public class GameLogic implements BallStrikeListener, BallPocketedListener, BallsCollisionListener, ObjectsRestListener {
 
-    private Game game;
+    private final Game game;
     private Ball ballTouchedByCue;
-    private List<Ball> contactedBalls;
-    private Set<Ball> pocketBalls;
-    private List<String> fouls;
+    private List<Ball> contactedBalls = new LinkedList<>();
+    private Set<Ball> pocketBalls = new HashSet<>();
+    private List<String> fouls = new LinkedList<>();
     private boolean deactivateUi = false;
     private final Renderer renderer;
     private Vector2 whiteBallStartPosition;
@@ -31,9 +31,6 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
     public GameLogic(Game game, Renderer renderer) {
         this.game = game;
         this.renderer = renderer;
-        fouls = new LinkedList<>();
-        pocketBalls = new HashSet<>();
-        contactedBalls = new LinkedList<>();
     }
 
     public boolean isDeactivateUi() {
@@ -94,7 +91,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
             }
 
             renderer.setFoulMessage(allFouls.toString());
-            renderer.setActionMessage(game.getActivePlayer().getName() + " commited a foul, switching players.");
+            renderer.setActionMessage(game.getActivePlayer().getName() + " committed a foul, switching players.");
         } else {
             int score = pocketBalls.size();
             game.getActivePlayer().addScore(score);
