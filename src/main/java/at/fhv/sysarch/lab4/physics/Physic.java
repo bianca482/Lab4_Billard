@@ -71,8 +71,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
             Body hitObjectData = results.get(0).getBody();
             Ball ball = (Ball) hitObjectData.getUserData();
 
-            // ToDo: Kugel an die Position setzen, bevor die weiße Kugel versenkt wurde
-            notifyBallCueListener(ball, ball.getPosition());
+            notifyBallCueListener(ball, hitObjectData.getTransform().getTranslation());
 
             //Weiße Kugel stoßen
             direction.multiply(FORCE); //Da mit der Direction multipliziert, wird gewirkte Kraft bei größerem Abstand größer
@@ -189,6 +188,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
 
                 Ball pockedBall = (Ball) ball.getUserData();
 
+                // ToDo: Dies erlaubt nicht, dass auch mehrere Bälle in einem einzelnen Zug versenkt werden können
                 if (!alreadySetPoint) {
                     alreadySetPoint = true;
                     notifyBallPocketedListeners(pockedBall);
