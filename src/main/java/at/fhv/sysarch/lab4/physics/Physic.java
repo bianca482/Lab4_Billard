@@ -9,16 +9,14 @@ import org.dyn4j.dynamics.contact.*;
 import org.dyn4j.geometry.Ray;
 import org.dyn4j.geometry.Vector2;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Physic implements RaycastListener, ContactListener, StepListener, FrameListener {
 
     private final static int FORCE = 500; //Kraft vorgeben
     private final World world;
     private boolean ballWasMovingInLastStep = false;
-    private boolean alreadySetPoint = false;
+    private Map<Ball, Boolean> alreadyPocketedBalls = new HashMap<>();
 
     private final List<BallsCollisionListener> ballsCollisionListeners = new LinkedList<>();
     private final List<BallPocketedListener> ballPocketedListeners = new LinkedList<>();
@@ -54,7 +52,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     }
 
     public void performStrike(double startX, double startY, double endX, double endY) {
-        alreadySetPoint = false;
+        alreadyPocketedBalls = new HashMap<>();
 
         Vector2 origin = new Vector2(startX, startY); //Anhand der Koordinaten bestimmen, wo der Stoß stattgefunden hat
         Vector2 direction = origin.difference(endX, endY); //Stoßrichtung berechnen
@@ -171,6 +169,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
         }
     }
 
+
     @Override
     public boolean persist(PersistedContactPoint point) {
         if (point.isSensor()) {
@@ -188,10 +187,15 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
 
                 Ball pockedBall = (Ball) ball.getUserData();
 
-                // ToDo: Dies erlaubt nicht, dass auch mehrere Bälle in einem einzelnen Zug versenkt werden können
-                if (!alreadySetPoint) {
-                    alreadySetPoint = true;
-                    notifyBallPocketedListeners(pockedBall);
+                // Damit das Versenken mehrere Bälle während eines Stoßes möglich ist:
+                // Ball nur hinzufügen, wenn er noch nicht in der Map ist
+                if (!alreadyPocketedBalls.containsKey(pockedBall)) {
+                    alreadyPocketedBalls.put(pockedBall, false);
+                    if (!alreadyPocketedBalls.get(pockedBall)) {
+                        notifyBallPocketedListeners(pockedBall);
+                        // true setzen, damit man weiß, die Punkte für das Versenken dieses Balles wurden bereits gezählt
+                        alreadyPocketedBalls.replace(pockedBall, true);
+                    }
                 }
             }
         }

@@ -101,7 +101,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
                 StringBuilder allPocketedBalls = new StringBuilder();
 
                 for (Ball ball : pocketBalls) {
-                    allPocketedBalls.append(ball.getBody().getUserData()).append("\n");
+                    allPocketedBalls.append(ball.getBody().getUserData()).append(", ");
                 }
                 renderer.setActionMessage(game.getActivePlayer().getName() + " pocketed the following balls: " + allPocketedBalls);
             }
