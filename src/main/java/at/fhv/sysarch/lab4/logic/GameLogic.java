@@ -25,7 +25,6 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
     private List<String> fouls = new LinkedList<>();
     private boolean deactivateUi = false;
     private final Renderer renderer;
-    private Vector2 whiteBallStartPosition;
     private Vector2 whiteBallOldPosition;
 
     public GameLogic(Game game, Renderer renderer) {
@@ -130,6 +129,5 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
         pocketBalls = new HashSet<>();
         fouls = new LinkedList<>();
         deactivateUi = true;
-        whiteBallStartPosition = this.game.getWhiteBall().getPosition();
     }
 }
