@@ -2,6 +2,7 @@ package at.fhv.sysarch.lab4.logic;
 
 import at.fhv.sysarch.lab4.game.Ball;
 import at.fhv.sysarch.lab4.game.Game;
+import at.fhv.sysarch.lab4.game.Table;
 import at.fhv.sysarch.lab4.logic.listener.BallStrikeListener;
 import at.fhv.sysarch.lab4.logic.listener.BallPocketedListener;
 import at.fhv.sysarch.lab4.logic.listener.BallsCollisionListener;
@@ -59,7 +60,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
             fouls.add("White Ball is in pocket.");
         }
         b.setVisible(false);
-
+        b.getBody().setLinearVelocity(0, 0); // Wartezeit verringern von Bällen die versenkt worden sind
         return false;
     }
 
@@ -106,21 +107,24 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
                 renderer.setActionMessage(game.getActivePlayer().getName() + " pocketed the following balls: " + allPocketedBalls);
             }
         }
+        // Bälle die außerhalb vom Table sind (z.B. durch zu festes schießen) werden als versenkt angesehen
 
-        if(pocketBalls.contains(this.game.getWhiteBall())){
-            this.game.getWhiteBall().setPosition(whiteBallOldPosition.x,whiteBallOldPosition.y);
+        for (Ball ball : this.game.getBalls()) {
+            Vector2 position = ball.getPosition();
+            if (Math.abs(position.x) > Table.Constants.WIDTH / 2 || Math.abs(position.y) > Table.Constants.HEIGHT / 2) {
+                ball.setVisible(false);
+            }
+        }
+        boolean whiteBallOutsideOfTable = Math.abs(game.getWhiteBall().getPosition().x) > Table.Constants.WIDTH / 2 || Math.abs(game.getWhiteBall().getPosition().y) > Table.Constants.HEIGHT / 2;
+        if (pocketBalls.contains(this.game.getWhiteBall()) || whiteBallOutsideOfTable) {
+            this.game.getWhiteBall().setPosition(whiteBallOldPosition.x, whiteBallOldPosition.y);
             this.game.getWhiteBall().setVisible(true);
         }
 
         deactivateUi = false;
 
+        handleEndState();
 
-        // ToDo:
-        /*
-        After the 14th ball is pocketed, the 14 balls are put back on the table with the top spot left
-        free. The current player can then continue either by playing the 15th ball or any other balls
-        in the rack. This continues forever.
-         */
     }
 
     @Override
@@ -130,4 +134,55 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
         fouls = new LinkedList<>();
         deactivateUi = true;
     }
+
+    private void handleEndState() {
+        // Überprüfen, ob 14 oder mehr Bälle versenkt sind
+        List<Ball> balls = this.game.getBalls();
+        List<Ball> hiddenBalls = new LinkedList<>();
+        int hiddenBallCount = 0;
+        Ball lastNotHiddenBall = null;
+        for (Ball ball : balls) {
+            if (!ball.isVisible()) {
+                hiddenBallCount++;
+                hiddenBalls.add(ball);
+            } else {
+                lastNotHiddenBall = ball;
+            }
+        }
+
+        if (hiddenBallCount >= 14) {
+            if (hiddenBallCount == 15) {
+                // Die letzten beiden Bälle wurden gleichzeitig versenkt, somit werden alle Bälle wieder als Dreieck angeordnet
+                this.game.placeBalls(balls);
+            } else if (hiddenBallCount == 14) {
+                // Die versenkten Bälle werden als unvollständiges Dreieck angeordnet - übrig gebliebener Ball bleibt an seiner Position, falls die Position nicht im Dreiecksbereich liegt
+                // Falls der Ball im Dreiecksbereich liegt, wird er neu positioniert.
+                this.game.placeBalls(hiddenBalls);
+                for (Ball hiddenBall : hiddenBalls) {
+                    double distance = hiddenBall.getPosition().distance(lastNotHiddenBall.getPosition());
+                    if (distance < 2 * Ball.Constants.RADIUS) {
+                        // letzter Ball berührt Dreieck und muss deshalb umgesetzt werden.
+                        double x0 = Table.Constants.WIDTH * 0.33;
+                        lastNotHiddenBall.setPosition(x0, 0);
+                        break;
+                    }
+                }
+            }
+
+            // Falls der weiße Ball im Dreiecksbereich liegt, oder auf dem neuen Platz des letzten Balls, wir der weiße Ball neu platziert
+            for (Ball hiddenBall : hiddenBalls) {
+                double distanceToWhiteBall = this.game.getWhiteBall().getPosition().distance(hiddenBall.getPosition());
+                if (distanceToWhiteBall < 2 * Ball.Constants.RADIUS) {
+                    // weißer Ball berührt Dreieck und muss deshalb umgesetzt werden.
+                    Vector2 newWhitePosition = new Vector2(Table.Constants.WIDTH * 0.25, 0);
+                    if (lastNotHiddenBall != null && lastNotHiddenBall.getPosition().distance(newWhitePosition) <= 2 * Ball.Constants.RADIUS) {
+                        newWhitePosition.add(-5 * Ball.Constants.RADIUS, 0);
+                    }
+                    this.game.getWhiteBall().setPosition(newWhitePosition.x, newWhitePosition.y);
+                    break;
+                }
+            }
+        }
+    }
+
 }

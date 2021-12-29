@@ -69,7 +69,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
             Body hitObjectData = results.get(0).getBody();
             Ball ball = (Ball) hitObjectData.getUserData();
 
-            notifyBallCueListener(ball, hitObjectData.getTransform().getTranslation());
+            notifyBallCueListener(ball, ball.getPosition());
 
             //Weiße Kugel stoßen
             direction.multiply(FORCE); //Da mit der Direction multipliziert, wird gewirkte Kraft bei größerem Abstand größer

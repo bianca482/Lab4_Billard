@@ -48,7 +48,7 @@ public enum Ball {
     }
 
     public Vector2 getPosition(){
-        return position;
+        return body.getTransform().getTranslation();
     }
 
     public Circle getShape() {

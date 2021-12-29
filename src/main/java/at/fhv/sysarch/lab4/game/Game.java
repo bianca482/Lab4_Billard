@@ -17,6 +17,7 @@ public class Game {
     private final Player player1 = new Player("Player 1");
     private final Player player2 = new Player("Player 2");
     private Player activePlayer = player1;
+    private List<Ball> balls;
     private Ball whiteBall;
     private GameLogic gameLogic;
 
@@ -77,7 +78,7 @@ public class Game {
         return cue;
     }
 
-    private void placeBalls(List<Ball> balls) {
+    public void placeBalls(List<Ball> balls) {
         Collections.shuffle(balls);
 
         // positioning the billard balls IN WORLD COORDINATES: meters
@@ -85,18 +86,22 @@ public class Game {
         int col = 0;
         int colSize = 5;
 
-        double y0 = -2 * Ball.Constants.RADIUS * 2;
+        double y0 = -4 * Ball.Constants.RADIUS;
         double x0 = -Table.Constants.WIDTH * 0.25 - Ball.Constants.RADIUS;
 
         for (Ball b : balls) {
+            b.setVisible(true);
+            // für Testzwecke
+//            if (balls.size() == 15 && row > 1) {
+//                b.setVisible(false);
+//                b.setPosition(Table.Constants.WIDTH, 0);
+//                continue;
+//            }
             double y = y0 + (2 * Ball.Constants.RADIUS * row) + (col * Ball.Constants.RADIUS);
             double x = x0 + (2 * Ball.Constants.RADIUS * col);
 
             b.setPosition(x, y);
             b.getBody().setLinearVelocity(0, 0);
-            renderer.addBall(b);
-            physic.addBody(b.getBody());
-
             row++;
 
             if (row == colSize) {
@@ -108,7 +113,7 @@ public class Game {
     }
 
     private void initWorld() {
-        List<Ball> balls = new ArrayList<>();
+        balls = new ArrayList<>();
 
         for (Ball b : Ball.values()) {
             if (b == Ball.WHITE) {
@@ -119,6 +124,10 @@ public class Game {
         }
 
         this.placeBalls(balls);
+        for (Ball ball : balls) {
+            renderer.addBall(ball);
+            physic.addBody(ball.getBody());
+        }
 
         Ball.WHITE.setPosition(Table.Constants.WIDTH * 0.25, 0);
 
@@ -136,7 +145,7 @@ public class Game {
     }
 
     public void onMousePressed(MouseEvent e) {
-        if(gameLogic.isDeactivateUi()){
+        if (gameLogic.isDeactivateUi()) {
             return;
         }
         double x = e.getX();
@@ -149,7 +158,7 @@ public class Game {
     }
 
     public void onMouseReleased(MouseEvent e) {
-        if(gameLogic.isDeactivateUi()){
+        if (gameLogic.isDeactivateUi()) {
             return;
         }
         double x = e.getX();
@@ -162,7 +171,7 @@ public class Game {
     }
 
     public void setOnMouseDragged(MouseEvent e) {
-        if(gameLogic.isDeactivateUi()){
+        if (gameLogic.isDeactivateUi()) {
             return;
         }
         double x = e.getX();
@@ -172,5 +181,9 @@ public class Game {
         double pY = this.getRenderer().screenToPhysicsY(y);
 
         this.getCue().setEndPosition(pX, pY);
+    }
+
+    public List<Ball> getBalls() {
+        return balls;
     }
 }
