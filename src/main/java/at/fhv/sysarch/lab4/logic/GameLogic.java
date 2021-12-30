@@ -7,6 +7,7 @@ import at.fhv.sysarch.lab4.logic.listener.BallStrikeListener;
 import at.fhv.sysarch.lab4.logic.listener.BallPocketedListener;
 import at.fhv.sysarch.lab4.logic.listener.BallsCollisionListener;
 import at.fhv.sysarch.lab4.logic.listener.ObjectsRestListener;
+import at.fhv.sysarch.lab4.physics.Physic;
 import at.fhv.sysarch.lab4.rendering.Renderer;
 import org.dyn4j.geometry.Vector2;
 
@@ -26,11 +27,13 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
     private List<String> fouls = new LinkedList<>();
     private boolean deactivateUi = false;
     private final Renderer renderer;
+    private final Physic physic;
     private Vector2 whiteBallOldPosition;
 
-    public GameLogic(Game game, Renderer renderer) {
+    public GameLogic(Game game, Renderer renderer, Physic physic) {
         this.game = game;
         this.renderer = renderer;
+        this.physic = physic;
     }
 
     public boolean isDeactivateUi() {
@@ -107,14 +110,15 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
                 renderer.setActionMessage(game.getActivePlayer().getName() + " pocketed the following balls: " + allPocketedBalls);
             }
         }
-        // Bälle die außerhalb vom Table sind (z.B. durch zu festes schießen) werden als versenkt angesehen
 
+        // Bälle die außerhalb vom Table sind (z.B. durch zu festes schießen) werden als versenkt angesehen
         for (Ball ball : this.game.getBalls()) {
             Vector2 position = ball.getPosition();
             if (Math.abs(position.x) > Table.Constants.WIDTH / 2 || Math.abs(position.y) > Table.Constants.HEIGHT / 2) {
                 ball.setVisible(false);
             }
         }
+
         boolean whiteBallOutsideOfTable = Math.abs(game.getWhiteBall().getPosition().x) > Table.Constants.WIDTH / 2 || Math.abs(game.getWhiteBall().getPosition().y) > Table.Constants.HEIGHT / 2;
         if (pocketBalls.contains(this.game.getWhiteBall()) || whiteBallOutsideOfTable) {
             this.game.getWhiteBall().setPosition(whiteBallOldPosition.x, whiteBallOldPosition.y);
@@ -124,7 +128,6 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
         deactivateUi = false;
 
         handleEndState();
-
     }
 
     @Override
@@ -182,6 +185,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
                     break;
                 }
             }
+            physic.resetBalls();
         }
     }
 

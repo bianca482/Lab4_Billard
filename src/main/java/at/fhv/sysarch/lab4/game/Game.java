@@ -25,7 +25,7 @@ public class Game {
         this.renderer = renderer;
         this.physic = physic;
 
-        this.gameLogic = new GameLogic(this, renderer);
+        this.gameLogic = new GameLogic(this, renderer, physic);
         this.physic.addObjectRestListener(gameLogic);
         this.physic.addBallPocketedListener(gameLogic);
         this.physic.addBallsCollisionListener(gameLogic);

@@ -11,11 +11,14 @@ import org.dyn4j.geometry.Vector2;
 
 import java.util.*;
 
+import static at.fhv.sysarch.lab4.game.Ball.WHITE;
+
 public class Physic implements RaycastListener, ContactListener, StepListener, FrameListener {
 
     private final static int FORCE = 500; //Kraft vorgeben
     private final World world;
     private boolean ballWasMovingInLastStep = false;
+    private List<Ball> allPocketedBalls = new LinkedList<>();
     private Map<Ball, Boolean> alreadyPocketedBalls = new HashMap<>();
 
     private final List<BallsCollisionListener> ballsCollisionListeners = new LinkedList<>();
@@ -52,7 +55,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     }
 
     public void performStrike(double startX, double startY, double endX, double endY) {
-        alreadyPocketedBalls = new HashMap<>();
+        alreadyPocketedBalls.clear();
 
         Vector2 origin = new Vector2(startX, startY); //Anhand der Koordinaten bestimmen, wo der Stoß stattgefunden hat
         Vector2 direction = origin.difference(endX, endY); //Stoßrichtung berechnen
@@ -75,6 +78,10 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
             direction.multiply(FORCE); //Da mit der Direction multipliziert, wird gewirkte Kraft bei größerem Abstand größer
             hitObjectData.applyForce(direction);
         }
+    }
+
+    public void resetBalls() {
+        allPocketedBalls.clear();
     }
 
     @Override
@@ -185,16 +192,19 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
                     ball = point.getBody2();
                 }
 
-                Ball pockedBall = (Ball) ball.getUserData();
+                Ball pocketedBall = (Ball) ball.getUserData();
 
                 // Damit das Versenken mehrere Bälle während eines Stoßes möglich ist:
                 // Ball nur hinzufügen, wenn er noch nicht in der Map ist
-                if (!alreadyPocketedBalls.containsKey(pockedBall)) {
-                    alreadyPocketedBalls.put(pockedBall, false);
-                    if (!alreadyPocketedBalls.get(pockedBall)) {
-                        notifyBallPocketedListeners(pockedBall);
+                if (!alreadyPocketedBalls.containsKey(pocketedBall) && (!allPocketedBalls.contains(pocketedBall) || pocketedBall.equals(WHITE))) {
+                    alreadyPocketedBalls.put(pocketedBall, false);
+                    if (!pocketedBall.equals(WHITE)) {
+                        allPocketedBalls.add(pocketedBall);
+                    }
+                    if (!alreadyPocketedBalls.get(pocketedBall)) {
+                        notifyBallPocketedListeners(pocketedBall);
                         // true setzen, damit man weiß, die Punkte für das Versenken dieses Balles wurden bereits gezählt
-                        alreadyPocketedBalls.replace(pockedBall, true);
+                        alreadyPocketedBalls.replace(pocketedBall, true);
                     }
                 }
             }
