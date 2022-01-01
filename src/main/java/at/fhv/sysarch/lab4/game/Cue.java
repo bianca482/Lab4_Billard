@@ -25,24 +25,24 @@ public class Cue {
         this.startY = y;
     }
 
-    public void setEndPosition (double x, double y){
+    public void setEndPosition(double x, double y) {
         this.endX = x;
         this.endY = y;
     }
 
-    public double getStartX(){
+    public double getStartX() {
         return this.startX;
     }
 
-    public double getStartY(){
+    public double getStartY() {
         return this.startY;
     }
 
-    public double getEndX(){
+    public double getEndX() {
         return this.endX;
     }
 
-    public double getEndY(){
+    public double getEndY() {
         return this.endY;
     }
 }

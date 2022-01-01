@@ -11,9 +11,9 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-//    private final static int SCENE_WIDTH  = 1920;
-//    private final static int SCENE_HEIGHT = 1080;
-    private final static int SCENE_WIDTH  = 1520;
+    // private final static int SCENE_WIDTH  = 1920;
+    // private final static int SCENE_HEIGHT = 1080;
+    private final static int SCENE_WIDTH = 1520;
     private final static int SCENE_HEIGHT = 780;
 
     @Override
@@ -23,9 +23,9 @@ public class Main extends Application {
         final Canvas c = new Canvas(SCENE_WIDTH, SCENE_WIDTH);
 
         Renderer renderer = new Renderer(
-            c.getGraphicsContext2D(),
-            SCENE_WIDTH, 
-            SCENE_HEIGHT);
+                c.getGraphicsContext2D(),
+                SCENE_WIDTH,
+                SCENE_HEIGHT);
 
         Physic physic = new Physic();
         renderer.setFrameListener(physic);

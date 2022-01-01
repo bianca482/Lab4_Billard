@@ -41,44 +41,46 @@ public class Renderer extends AnimationTimer {
 
     private final double[] xsBuffer = new double[4];
     private final double[] ysBuffer = new double[4];
-    
+
     private String strikeMessage;
     private String foulMessage;
     private String actionMessage;
 
     private Optional<FrameListener> frameListener;
 
-    public Renderer(final GraphicsContext gc, 
-        int sceneWidth, int sceneHeight) {
+    public Renderer(final GraphicsContext gc, int sceneWidth, int sceneHeight) {
         this.gc = gc;
 
         this.balls = new ArrayList<>();
-        
+
         this.centerX = (double) sceneWidth * 0.5;
         this.centerY = (double) sceneHeight * 0.5;
         this.sceneWidth = sceneWidth;
         this.sceneHeight = sceneHeight;
-        
+
         this.frameListener = Optional.empty();
-        
+
         this.poolCoords = new Affine();
         this.poolCoords.appendTranslation(this.centerX, this.centerY);
 
         this.fpsTrans = new Affine();
         this.fpsTrans.appendTranslation(0, 10);
         this.fpsTrans.appendScale(1.5, 1.5);
-        
+
         // caching of identity for reverting to JavaFX coordinates
         this.jfxCoords = new Affine();
 
         this.gc.setStroke(Color.WHITE);
     }
+
     public void setPlayer1(Player player1) {
         this.player1 = player1;
     }
+
     public void setPlayer2(Player player2) {
         this.player2 = player2;
     }
+
     public void setStrikeMessage(String strikeMessage) {
         this.strikeMessage = strikeMessage;
     }
@@ -103,9 +105,13 @@ public class Renderer extends AnimationTimer {
         this.frameListener = Optional.of(l);
     }
 
-    public void setCue(Cue cue) { this.cue = cue; }
+    public void setCue(Cue cue) {
+        this.cue = cue;
+    }
 
-    public Cue getCue() { return this.cue; }
+    public Cue getCue() {
+        return this.cue;
+    }
 
     public void drawWhiteBall(Ball b) {
         Transform t = b.getBody().getTransform();
@@ -141,7 +147,7 @@ public class Renderer extends AnimationTimer {
         // screen has origin (0/0) top left corner,
         // physics has origin (0/0) center of the screen
         // and physics is scaled by factor SCALE
-        
+
         double pY = screenY - centerY;
         pY = pY / SCALE;
 
@@ -159,9 +165,9 @@ public class Renderer extends AnimationTimer {
         this.drawBalls();
         this.drawCue();
         this.drawFPS(dt);
-        
+
         this.drawMessages();
-        
+
         this.lastUpdate = now;
     }
 
@@ -180,7 +186,7 @@ public class Renderer extends AnimationTimer {
         this.gc.setTransform(this.poolCoords);
         this.gc.setFill(Color.DARKGREEN);
         this.gc.fillRect(tableX, tableY, tableWidth, tableHeight);
-       
+
         List<BodyFixture> fs = this.table.getBody().getFixtures();
         for (BodyFixture f : fs) {
             TablePart tp = (TablePart) f.getUserData();
@@ -201,7 +207,7 @@ public class Renderer extends AnimationTimer {
 
         // render billard balls after table, so they appear on top
         for (Ball b : this.balls) {
-            if(!b.isVisible()){
+            if (!b.isVisible()) {
                 // continue with the next element in the list
                 continue;
             }
@@ -211,15 +217,15 @@ public class Renderer extends AnimationTimer {
 
             double r = s.getRadius() * SCALE;
             double d = r * 2;
-            
+
             double x = t.getTranslationX() * SCALE;
             double y = t.getTranslationY() * SCALE;
-            
+
             // rendering of billard balls happens in their own coordinates
             // center of the world is at center of the window not top left corner
             Affine ballTrans = new Affine(this.poolCoords);
             ballTrans.appendTranslation(x, y);
-            
+
             this.gc.setTransform(ballTrans);
 
             // NOTE center of phyics circle is in the center
@@ -227,7 +233,7 @@ public class Renderer extends AnimationTimer {
 
             this.gc.setFill(b.getColor());
             this.gc.fillOval(-r, -r, d, d);
-            
+
             if (b.isWhite()) {
                 continue;
             }
@@ -240,7 +246,7 @@ public class Renderer extends AnimationTimer {
 
             // white circle with black number is same for all balls (except white) 
             this.gc.setFill(Color.WHITE);
-            this.gc.fillOval(-r * 0.5, -r * 0.5, d *  0.5, d *  0.5);
+            this.gc.fillOval(-r * 0.5, -r * 0.5, d * 0.5, d * 0.5);
 
             this.gc.setStroke(Color.BLACK);
             int xOff = b.ordinal() >= 9 ? -8 : -5;
@@ -291,12 +297,12 @@ public class Renderer extends AnimationTimer {
         strikeMsgTrans.appendTranslation(this.centerX - 250, 50);
         strikeMsgTrans.appendScale(2, 2);
 
-        foulMsgTrans.appendTranslation(this.centerX - 250,  this.centerY + 300);
+        foulMsgTrans.appendTranslation(this.centerX - 250, this.centerY + 300);
         foulMsgTrans.appendScale(2, 2);
 
-        player1ScoreTrans.appendTranslation(10, this.sceneHeight -50);
+        player1ScoreTrans.appendTranslation(10, this.sceneHeight - 50);
         player1ScoreTrans.appendScale(5, 5);
-        
+
         player2ScoreTrans.appendTranslation(this.centerX + 200, this.sceneHeight - 50);
         player2ScoreTrans.appendScale(5, 5);
 
@@ -321,9 +327,9 @@ public class Renderer extends AnimationTimer {
 
     private void renderCushion(Polygon p) {
         this.gc.setFill(Color.BROWN);
-        
+
         Vector2[] vs = p.getVertices();
-        
+
         int i = 0;
         for (Vector2 v : vs) {
             xsBuffer[i] = v.x * SCALE;
@@ -344,7 +350,7 @@ public class Renderer extends AnimationTimer {
         double d = r * 2;
         double x = c.getCenter().x * SCALE;
         double y = c.getCenter().y * SCALE;
-        
+
         Affine pocketTrans = new Affine(this.poolCoords);
         pocketTrans.appendTranslation(x, y);
 

@@ -22,11 +22,11 @@ public class Player {
         return this.score;
     }
 
-    public void addScore(int points){
+    public void addScore(int points) {
         this.score += points;
     }
 
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 }

@@ -91,17 +91,14 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
 
     @Override
     public void begin(Step step, World world) {
-
     }
 
     @Override
     public void updatePerformed(Step step, World world) {
-
     }
 
     @Override
     public void postSolve(Step step, World world) {
-
     }
 
     @Override
@@ -156,10 +153,8 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
         }
     }
 
-
     @Override
     public void sensed(ContactPoint point) {
-
     }
 
     @Override
@@ -175,7 +170,6 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
             notifyBallsCollisionListeners(ball1, ball2);
         }
     }
-
 
     @Override
     public boolean persist(PersistedContactPoint point) {
@@ -219,7 +213,6 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
 
     @Override
     public void postSolve(SolvedContactPoint point) {
-
     }
 
     @Override

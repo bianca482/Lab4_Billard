@@ -30,38 +30,7 @@ public enum Ball {
     private boolean solid;
     private Vector2 position;
     private boolean isVisible = true;
-
     private Body body;
-
-    public Color getColor() { 
-        return this.c; 
-    }
-
-    public boolean isSolid() {
-        return this.solid; 
-    }
-
-    public void setPosition(double x, double y) {
-        this.position = new Vector2(x,y);
-        this.body.translateToOrigin();
-        this.body.translate(x, y);
-    }
-
-    public Vector2 getPosition(){
-        return body.getTransform().getTranslation();
-    }
-
-    public Circle getShape() {
-        return (Circle) this.getBody().getFixture(0).getShape();
-    }
-
-    public Body getBody() {
-        return this.body;
-    }
-
-    public boolean isWhite() {
-        return this == WHITE;
-    }
 
     private Ball(Color c, boolean solid) {
         this.c = c;
@@ -71,7 +40,7 @@ public enum Ball {
         this.body.addFixture(
                 Geometry.createCircle(Constants.RADIUS),
                 Constants.DENSITY,
-                Constants.FRICTION, 
+                Constants.FRICTION,
                 Constants.RESTITUTION);
         this.body.translate(0, 0);
         // disable rotation, looks strange
@@ -87,9 +56,9 @@ public enum Ball {
         public final static double RADIUS = 0.05715;
         // pool balls have a mass of 0.17 kg
         private final static double MASS = 0.17;
-        private final static double VOLUME = (4.0/3.0) * Math.PI * Math.pow(RADIUS, 3.0);
+        private final static double VOLUME = (4.0 / 3.0) * Math.PI * Math.pow(RADIUS, 3.0);
         private final static double DENSITY = MASS / VOLUME; // density in kg/m^3
-    
+
         // linear damping is used to slow down the balls over time due to
         // friction with the underlying table surface
         // NOTE: this is a purely experimental value, which is obtained by
@@ -97,15 +66,45 @@ public enum Ball {
         private final static double LINEAR_DAMPING = 0.95;
         // same as linear damping but for rotation
         private final static double ANGULAR_DAMPING = 0.3;
-    
+
         // https://billiards.colostate.edu/bd_articles/2005/april05.pdf
-        // "Most reported values for pool balls are close to 0.06, meaning that 
-        // the friction force can be only about 6% as large as the perpendicular 
+        // "Most reported values for pool balls are close to 0.06, meaning that
+        // the friction force can be only about 6% as large as the perpendicular
         // impact force between the balls."
         private final static double FRICTION = 0.06;
         // "Most experimental numbers I have seen for the coefficient of restitution
         // for pool balls have been in the range 0.90 to 0.96."
         private final static double RESTITUTION = 0.93;
+    }
+
+    public Color getColor() {
+        return this.c;
+    }
+
+    public boolean isSolid() {
+        return this.solid;
+    }
+
+    public void setPosition(double x, double y) {
+        this.position = new Vector2(x, y);
+        this.body.translateToOrigin();
+        this.body.translate(x, y);
+    }
+
+    public Vector2 getPosition() {
+        return body.getTransform().getTranslation();
+    }
+
+    public Circle getShape() {
+        return (Circle) this.getBody().getFixture(0).getShape();
+    }
+
+    public Body getBody() {
+        return this.body;
+    }
+
+    public boolean isWhite() {
+        return this == WHITE;
     }
 
     public boolean isVisible() {

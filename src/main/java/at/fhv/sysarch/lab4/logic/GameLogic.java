@@ -188,5 +188,4 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
             physic.resetBalls();
         }
     }
-
 }
