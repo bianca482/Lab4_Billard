@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static at.fhv.sysarch.lab4.game.Ball.WHITE;
 
@@ -100,8 +101,14 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
             } else {
                 StringBuilder allPocketedBalls = new StringBuilder();
 
-                for (Ball ball : pocketBalls) {
-                    allPocketedBalls.append(ball.getBody().getUserData()).append(", ");
+                List<Ball> ballList = pocketBalls.stream().collect(Collectors.toList());
+                for (int i = 0; i < ballList.size(); i++) {
+                    Ball ball = ballList.get(i);
+                    if (i == (ballList.size() - 1)) {
+                        allPocketedBalls.append(ball.getBody().getUserData());
+                    } else {
+                        allPocketedBalls.append(ball.getBody().getUserData()).append(", ");
+                    }
                 }
                 renderer.setActionMessage(game.getActivePlayer().getName() + " pocketed the following balls: " + allPocketedBalls);
             }
