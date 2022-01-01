@@ -21,13 +21,13 @@ import static at.fhv.sysarch.lab4.game.Ball.WHITE;
 public class GameLogic implements BallStrikeListener, BallPocketedListener, BallsCollisionListener, ObjectsRestListener {
 
     private final Game game;
+    private final Renderer renderer;
+    private final Physic physic;
     private Ball ballTouchedByCue;
     private List<Ball> contactedBalls = new LinkedList<>();
     private Set<Ball> pocketBalls = new HashSet<>();
     private List<String> fouls = new LinkedList<>();
     private boolean deactivateUi = false;
-    private final Renderer renderer;
-    private final Physic physic;
     private Vector2 whiteBallOldPosition;
 
     public GameLogic(Game game, Renderer renderer, Physic physic) {
@@ -38,10 +38,6 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
 
     public boolean isDeactivateUi() {
         return deactivateUi;
-    }
-
-    public void setDeactivateUi(boolean deactivateUi) {
-        this.deactivateUi = deactivateUi;
     }
 
     @Override

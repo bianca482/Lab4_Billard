@@ -13,13 +13,14 @@ public class Game {
 
     private final Renderer renderer;
     private final Physic physic;
+    private final GameLogic gameLogic;
+    private final Player player1;
+    private final Player player2;
+    private Player activePlayer;
     private Cue cue;
-    private final Player player1 = new Player("Player 1");
-    private final Player player2 = new Player("Player 2");
-    private Player activePlayer = player1;
     private List<Ball> balls;
     private Ball whiteBall;
-    private GameLogic gameLogic;
+
 
     public Game(Renderer renderer, Physic physic) {
         this.renderer = renderer;
@@ -31,8 +32,11 @@ public class Game {
         this.physic.addBallsCollisionListener(gameLogic);
         this.physic.addBallStrikeListener(gameLogic);
 
+        this.player1 = new Player("Player 1");
+        this.player2 = new Player("Player 2");
         this.renderer.setPlayer1(player1);
         this.renderer.setPlayer2(player2);
+        activePlayer = player1;
         player1.setActivePlayer(true);
 
         this.initWorld();

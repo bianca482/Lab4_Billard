@@ -28,7 +28,6 @@ public enum Ball {
 
     private Color c;
     private boolean solid;
-    private Vector2 position;
     private boolean isVisible = true;
     private Body body;
 
@@ -86,7 +85,6 @@ public enum Ball {
     }
 
     public void setPosition(double x, double y) {
-        this.position = new Vector2(x, y);
         this.body.translateToOrigin();
         this.body.translate(x, y);
     }
