@@ -9,17 +9,19 @@ In der Klasse Main wurde die Größe der Applikation (SCENE_WIDTH, SCENE_HEIGHT)
 Das Jar-File *billard.jar* kann mittels Kommandozeile wie folgt gestartet werden:
 *java -p  "<java_fx_path>" --add-modules javafx.controls,javafx.fxml -jar billard.jar* (wobei <java_fx_path> mit dem JAVA FX-Installationspfad des eigenen PCs angepasst werden muss.)
 
+
 Bianca:
-- Player-Klasse, warum erstellt
-Die beiden SpielerInnen werden über die Klasse Player abgebildet, damit der Score, Name (Player 1 und Player 2), 
+
+### Allgemeiner Aufbau der Applikation
+Die beiden SpielerInnen werden über die Klasse Player abgebildet, damit der Score, Name (Player 1 und Player 2),
 sowie das Festhalten des aktiven Players an derselben Stelle gespeichert werden können.
 
-- Physics Klasse und Listeners (Observer Pattern), Billard Listener
+
+### Verwendung der Physics Engine dyn4j
+- ToDo: Physics Klasse und Listeners (Observer Pattern), Billard Listener
 
 
-- Gamelogic ausgelagert die Interfaces implementiert
-- Grob erklären wie Physics und Gamelogic funktioniert
-
+### Spielelogik und Zusammenhang mit Physic
 Um die Spielelogik getrennt von der Physic halten zu können, wurde die Klasse **GameLogic** erstellt.
 Hierin wird alles abgehandelt, was mit der Spielelogik und Befolgung der Regeln zusammenhängt. 
 Die Klasse GameLogic implementiert die Interfaces BallStrikeListener, BallPocketedListener, BallsCollisionListener 
