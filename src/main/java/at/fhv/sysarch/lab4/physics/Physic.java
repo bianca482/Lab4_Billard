@@ -18,8 +18,8 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     private final static int FORCE = 500; //Kraft vorgeben
     private final World world;
     private boolean ballWasMovingInLastStep = false;
-    private List<Ball> allPocketedBalls = new LinkedList<>();
-    private Map<Ball, Boolean> alreadyPocketedBalls = new HashMap<>();
+    private List<Ball> allPocketedBallsOfGame = new LinkedList<>();
+    private Map<Ball, Boolean> countedBallsOfStrike = new HashMap<>();
 
     private final List<BallsCollisionListener> ballsCollisionListeners = new LinkedList<>();
     private final List<BallPocketedListener> ballPocketedListeners = new LinkedList<>();
@@ -29,24 +29,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     public Physic() {
         this.world = new World();
         this.world.setGravity(World.ZERO_GRAVITY);
-        //this.world.getSettings().setStepFrequency(); //Wiederholfrequenz evtl notwendig bei Problemen
-        this.world.addListener(this); //Physics Klasse soll notifiziert werden wenn in der Welt was passiert
-    }
-
-    public void addBallsCollisionListener(BallsCollisionListener ballsCollisionListener) {
-        ballsCollisionListeners.add(ballsCollisionListener);
-    }
-
-    public void addBallPocketedListener(BallPocketedListener ballPocketedListener) {
-        ballPocketedListeners.add(ballPocketedListener);
-    }
-
-    public void addBallStrikeListener(BallStrikeListener ballStrikeListener) {
-        ballStrikeListeners.add(ballStrikeListener);
-    }
-
-    public void addObjectRestListener(ObjectsRestListener objectsRestListener) {
-        objectsRestListeners.add(objectsRestListener);
+        this.world.addListener(this);
     }
 
     //Eventuell neues Interface welche diese zusätzlichen Methoden definiert
@@ -55,7 +38,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     }
 
     public void performStrike(double startX, double startY, double endX, double endY) {
-        alreadyPocketedBalls.clear();
+        countedBallsOfStrike.clear();
 
         Vector2 origin = new Vector2(startX, startY); //Anhand der Koordinaten bestimmen, wo der Stoß stattgefunden hat
         Vector2 direction = origin.difference(endX, endY); //Stoßrichtung berechnen
@@ -81,7 +64,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     }
 
     public void resetBalls() {
-        allPocketedBalls.clear();
+        allPocketedBallsOfGame.clear();
     }
 
     @Override
@@ -90,16 +73,13 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     }
 
     @Override
-    public void begin(Step step, World world) {
-    }
+    public void begin(Step step, World world) {}
 
     @Override
-    public void updatePerformed(Step step, World world) {
-    }
+    public void updatePerformed(Step step, World world) {}
 
     @Override
-    public void postSolve(Step step, World world) {
-    }
+    public void postSolve(Step step, World world) {}
 
     @Override
     public void end(Step step, World world) {
@@ -123,39 +103,8 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
         }
     }
 
-    private void notifyBallPocketedListeners(Ball ball) {
-        for (BallPocketedListener ballPocketedListener : ballPocketedListeners) {
-            ballPocketedListener.onBallPocketed(ball);
-        }
-    }
-
-    private void notifyBallsCollisionListeners(Ball ball1, Ball ball2) {
-        for (BallsCollisionListener ballsCollisionListener : ballsCollisionListeners) {
-            ballsCollisionListener.onBallsCollide(ball1, ball2);
-        }
-    }
-
-    private void notifyBallCueListener(Ball ball, Vector2 oldPosition) {
-        for (BallStrikeListener ballStrikeListener : ballStrikeListeners) {
-            ballStrikeListener.onBallStrike(ball, oldPosition);
-        }
-    }
-
-    private void notifyObjectRestListenerEnd() {
-        for (ObjectsRestListener objectsRestListener : objectsRestListeners) {
-            objectsRestListener.onEndAllObjectsRest();
-        }
-    }
-
-    private void notifyObjectRestListenerStart() {
-        for (ObjectsRestListener objectsRestListener : objectsRestListeners) {
-            objectsRestListener.onStartAllObjectsRest();
-        }
-    }
-
     @Override
-    public void sensed(ContactPoint point) {
-    }
+    public void sensed(ContactPoint point) {}
 
     @Override
     public boolean begin(ContactPoint point) {
@@ -190,15 +139,15 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
 
                 // Damit das Versenken mehrere Bälle während eines Stoßes möglich ist:
                 // Ball nur hinzufügen, wenn er noch nicht in der Map ist
-                if (!alreadyPocketedBalls.containsKey(pocketedBall) && (!allPocketedBalls.contains(pocketedBall) || pocketedBall.equals(WHITE))) {
-                    alreadyPocketedBalls.put(pocketedBall, false);
+                if (!countedBallsOfStrike.containsKey(pocketedBall) && (!allPocketedBallsOfGame.contains(pocketedBall) || pocketedBall.equals(WHITE))) {
+                    countedBallsOfStrike.put(pocketedBall, false);
                     if (!pocketedBall.equals(WHITE)) {
-                        allPocketedBalls.add(pocketedBall);
+                        allPocketedBallsOfGame.add(pocketedBall);
                     }
-                    if (!alreadyPocketedBalls.get(pocketedBall)) {
+                    if (!countedBallsOfStrike.get(pocketedBall)) {
                         notifyBallPocketedListeners(pocketedBall);
                         // true setzen, damit man weiß, die Punkte für das Versenken dieses Balles wurden bereits gezählt
-                        alreadyPocketedBalls.replace(pocketedBall, true);
+                        countedBallsOfStrike.replace(pocketedBall, true);
                     }
                 }
             }
@@ -212,8 +161,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     }
 
     @Override
-    public void postSolve(SolvedContactPoint point) {
-    }
+    public void postSolve(SolvedContactPoint point) {}
 
     @Override
     public boolean allow(Ray ray, Body body, BodyFixture fixture) {
@@ -227,5 +175,51 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     @Override
     public boolean allow(Ray ray, Body body, BodyFixture fixture, Raycast raycast) {
         return true;
+    }
+
+    public void addBallsCollisionListener(BallsCollisionListener ballsCollisionListener) {
+        ballsCollisionListeners.add(ballsCollisionListener);
+    }
+
+    public void addBallPocketedListener(BallPocketedListener ballPocketedListener) {
+        ballPocketedListeners.add(ballPocketedListener);
+    }
+
+    public void addBallStrikeListener(BallStrikeListener ballStrikeListener) {
+        ballStrikeListeners.add(ballStrikeListener);
+    }
+
+    public void addObjectRestListener(ObjectsRestListener objectsRestListener) {
+        objectsRestListeners.add(objectsRestListener);
+    }
+
+    private void notifyBallPocketedListeners(Ball ball) {
+        for (BallPocketedListener ballPocketedListener : ballPocketedListeners) {
+            ballPocketedListener.onBallPocketed(ball);
+        }
+    }
+
+    private void notifyBallsCollisionListeners(Ball ball1, Ball ball2) {
+        for (BallsCollisionListener ballsCollisionListener : ballsCollisionListeners) {
+            ballsCollisionListener.onBallsCollide(ball1, ball2);
+        }
+    }
+
+    private void notifyBallCueListener(Ball ball, Vector2 oldPosition) {
+        for (BallStrikeListener ballStrikeListener : ballStrikeListeners) {
+            ballStrikeListener.onBallStrike(ball, oldPosition);
+        }
+    }
+
+    private void notifyObjectRestListenerEnd() {
+        for (ObjectsRestListener objectsRestListener : objectsRestListeners) {
+            objectsRestListener.onEndAllObjectsRest();
+        }
+    }
+
+    private void notifyObjectRestListenerStart() {
+        for (ObjectsRestListener objectsRestListener : objectsRestListeners) {
+            objectsRestListener.onStartAllObjectsRest();
+        }
     }
 }

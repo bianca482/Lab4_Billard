@@ -11,11 +11,7 @@ import at.fhv.sysarch.lab4.physics.Physic;
 import at.fhv.sysarch.lab4.rendering.Renderer;
 import org.dyn4j.geometry.Vector2;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static at.fhv.sysarch.lab4.game.Ball.WHITE;
 
@@ -83,7 +79,6 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
 
         if (fouls.size() != 0) {
             game.getActivePlayer().addScore(-1);
-            game.switchPlayer();
             StringBuilder allFouls = new StringBuilder();
 
             for (String foul : fouls) {
@@ -92,6 +87,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
 
             renderer.setFoulMessage(allFouls.toString());
             renderer.setActionMessage(game.getActivePlayer().getName() + " committed a foul, switching players.");
+            game.switchPlayer();
         } else {
             int score = pocketBalls.size();
             game.getActivePlayer().addScore(score);
@@ -101,7 +97,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
             } else {
                 StringBuilder allPocketedBalls = new StringBuilder();
 
-                List<Ball> ballList = pocketBalls.stream().collect(Collectors.toList());
+                List<Ball> ballList = new ArrayList<>(pocketBalls);
                 for (int i = 0; i < ballList.size(); i++) {
                     Ball ball = ballList.get(i);
                     if (i == (ballList.size() - 1)) {

@@ -109,29 +109,6 @@ public class Renderer extends AnimationTimer {
         this.cue = cue;
     }
 
-    public Cue getCue() {
-        return this.cue;
-    }
-
-    public void drawWhiteBall(Ball b) {
-        Transform t = b.getBody().getTransform();
-        Circle s = b.getShape();
-
-        double r = s.getRadius() * SCALE;
-        double d = r * 2;
-
-        double x = t.getTranslationX() * SCALE;
-        double y = t.getTranslationY() * SCALE;
-
-        Affine ballTrans = new Affine(this.poolCoords);
-        ballTrans.appendTranslation(x, y);
-
-        this.gc.setTransform(ballTrans);
-
-        this.gc.setFill(b.getColor());
-        this.gc.fillOval(-r, -r, d, d);
-    }
-
     public double screenToPhysicsX(double screenX) {
         // screen has origin (0/0) top left corner,
         // physics has origin (0/0) center of the screen
