@@ -13,7 +13,7 @@ import java.util.*;
 
 import static at.fhv.sysarch.lab4.game.Ball.WHITE;
 
-public class Physic implements RaycastListener, ContactListener, StepListener, FrameListener {
+public class Physic implements RaycastListener, ContactListener, StepListener, FrameListener, BillardListener {
 
     private final static int FORCE = 500; //Kraft vorgeben
     private final World world;
@@ -32,11 +32,12 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
         this.world.addListener(this);
     }
 
-    //Eventuell neues Interface welche diese zusätzlichen Methoden definiert
+    @Override
     public void addBody(Body b) {
         this.world.addBody(b);
     }
 
+    @Override
     public void performStrike(double startX, double startY, double endX, double endY) {
         countedBallsOfStrike.clear();
 
@@ -63,8 +64,29 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
         }
     }
 
+    @Override
     public void resetBalls() {
         allPocketedBallsOfGame.clear();
+    }
+
+    @Override
+    public void addBallsCollisionListener(BallsCollisionListener ballsCollisionListener) {
+        ballsCollisionListeners.add(ballsCollisionListener);
+    }
+
+    @Override
+    public void addBallPocketedListener(BallPocketedListener ballPocketedListener) {
+        ballPocketedListeners.add(ballPocketedListener);
+    }
+
+    @Override
+    public void addBallStrikeListener(BallStrikeListener ballStrikeListener) {
+        ballStrikeListeners.add(ballStrikeListener);
+    }
+
+    @Override
+    public void addObjectRestListener(ObjectsRestListener objectsRestListener) {
+        objectsRestListeners.add(objectsRestListener);
     }
 
     @Override
@@ -175,22 +197,6 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
     @Override
     public boolean allow(Ray ray, Body body, BodyFixture fixture, Raycast raycast) {
         return true;
-    }
-
-    public void addBallsCollisionListener(BallsCollisionListener ballsCollisionListener) {
-        ballsCollisionListeners.add(ballsCollisionListener);
-    }
-
-    public void addBallPocketedListener(BallPocketedListener ballPocketedListener) {
-        ballPocketedListeners.add(ballPocketedListener);
-    }
-
-    public void addBallStrikeListener(BallStrikeListener ballStrikeListener) {
-        ballStrikeListeners.add(ballStrikeListener);
-    }
-
-    public void addObjectRestListener(ObjectsRestListener objectsRestListener) {
-        objectsRestListeners.add(objectsRestListener);
     }
 
     private void notifyBallPocketedListeners(Ball ball) {
