@@ -50,13 +50,13 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
         boolean hit = this.world.raycast(ray, 0, true, false, results); // prüfen ob was getroffen wurde und wenn ja, was getroffen wurde (=results)
 
         if (hit) {
-            notifyObjectRestListenerStart();
+            notifyObjectRestStartListeners();
 
             // Angestoßenes Objekt
             Body hitObjectData = results.get(0).getBody();
             Ball ball = (Ball) hitObjectData.getUserData();
 
-            notifyBallCueListener(ball, ball.getPosition());
+            notifyBallCueListeners(ball, ball.getPosition());
 
             //Weiße Kugel stoßen
             direction.multiply(FORCE); //Da mit der Direction multipliziert, wird gewirkte Kraft bei größerem Abstand größer
@@ -120,7 +120,7 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
             // Bälle bewegen sich nun, oder bewegen sich nun nicht mehr
             ballWasMovingInLastStep = ballIsMoving;
             if (!ballIsMoving) {
-                notifyObjectRestListenerEnd();
+                notifyObjectRestEndListeners();
             }
         }
     }
@@ -211,19 +211,19 @@ public class Physic implements RaycastListener, ContactListener, StepListener, F
         }
     }
 
-    private void notifyBallCueListener(Ball ball, Vector2 oldPosition) {
+    private void notifyBallCueListeners(Ball ball, Vector2 oldPosition) {
         for (BallStrikeListener ballStrikeListener : ballStrikeListeners) {
             ballStrikeListener.onBallStrike(ball, oldPosition);
         }
     }
 
-    private void notifyObjectRestListenerEnd() {
+    private void notifyObjectRestEndListeners() {
         for (ObjectsRestListener objectsRestListener : objectsRestListeners) {
             objectsRestListener.onEndAllObjectsRest();
         }
     }
 
-    private void notifyObjectRestListenerStart() {
+    private void notifyObjectRestStartListeners() {
         for (ObjectsRestListener objectsRestListener : objectsRestListeners) {
             objectsRestListener.onStartAllObjectsRest();
         }
