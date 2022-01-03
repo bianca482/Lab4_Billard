@@ -88,6 +88,15 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
             renderer.setFoulMessage(allFouls.toString());
             renderer.setActionMessage(game.getActivePlayer().getName() + " committed a foul, switching players.");
             game.switchPlayer();
+
+            // TODO
+            // Verbleibt weiße Kugel auf dem Tisch, könnt ihr ein Platzieren per Hand implementieren.
+            // Ihr könnt selbst entscheiden, ob das immer erfolgt, oder nur bei bestimmten Fouls.
+            // Beispielsweise kann die weiße Kugel auf der neuen Position verbleiben sofern keine Kugel getroffen wurde.
+            // Wird zuerst eine andere Kugel als die weiße gestoßen, so kann die Platzierung per Hand erfolgen.
+            // Wie ihr das genau umsetzt, ist euch überlassen.
+            // Wichtig ist hier eher der generelle Ablauf und die Spielfolge.
+
         } else {
             int score = pocketBalls.size();
             game.getActivePlayer().addScore(score);
