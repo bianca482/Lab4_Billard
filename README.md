@@ -37,7 +37,7 @@ Hierin wird alles abgehandelt, was mit der Spielelogik und Befolgung der Regeln 
 Die Klasse GameLogic implementiert die Interfaces BallStrikeListener, BallPocketedListener, BallsCollisionListener 
 sowie ObjectsRestListener, damit auf die jeweiligen Ereignisse, die es von Physic bekommt, reagiert werden kann. 
 Die Methode onStartAllObjectsRest wird dann aufgerufen, sobald ein Ball mit dem Cue angeschlagen wurde.
-Dies initialisiert auch die für die GameLogic notwendigen Listen.
+Dies initialisiert auch die für die GameLogic notwendigen Listen und deaktiviert das UI, sodass während des Spielzugs kein erneutes Anstoßen mit dem Cue möglich ist. Das UI bleibt solange deaktiviert, bis sich keine Kugeln mehr bewegen.
 
 Wird z.B. ein Ball getroffen, ruft Physic die Methode onBallStrike auf. In dieser Methode
 wird zunächst geprüft ob das Foul *"It is a foul if any other ball than the white one is stroke by the cue."*
@@ -58,16 +58,24 @@ Falls kein Foul begangen wurde, wird anhand der Anzahl der versenkten Kugeln die
 berechnet. Außerdem wird der Spieler gleich gewechselt, wenn gar kein Ball versenkt wurde. Ansonsten werden wieder die
 jeweiligen Messages gesetzt und das Spiel kann weitergehen.
 
+Damit versenkte Kugeln nicht mehr angezeigt werden, werden diese Kuglen mit der setVisible-Methode unsichtbar gemacht.
+Wird eine Kugel so fest angestoßen, sodass sie über den Tisch gespielt wird und sich somit außerhalb des Tisches befindet, wird dies, außer es handelt sich um die weiße Kugel, nicht als Foul gewertet.
+Da sich diese Kugel aber nicht mehr auf dem Tisch befindet wird sie ebenfalls unsichtbar gemacht.
+
+Die Methode allow ermöglicht es, den Cue auch außerhalb des Tisches zu verwenden.
+Dies wurde deshalb implementiert, damit Kugeln, die sich am Rande des Tisches befinden, direkt an dieser Kante von außen angespielt werden können.
+
 Die Methode handleEndState kümmert sich zudem um das Zurücksetzen der Bälle in die Dreiecksform, wobei hier
-die oberste Kugel (von der Startposition des Cue aus gesehen) freigelassen wird. Wenn also 
+die oberste Kugel (von der Startposition des Cue aus gesehen) freigelassen wird. Wenn also
 14 Bälle (oder 15, falls der letzte Stoß die letzten zwei Kugeln versenkt hat) versenkt wurden, werden alle bisher versenkten
 Bälle wieder in diesem unvollständigem Dreieck positioniert.
 
 
-Ilona:
-UI deaktivieren während Spiels
-Außerhalb von Tisch spielen möglich
-Bälle die außerhalb vom Table sind (z.B. durch zu festes schießen) werden als versenkt angesehen außer beim weißen Ball
-Ball versenken setVisible --> unsichtbar machen
-Ball Position --> aktuelle Position gespeichert
-Rendering von Cue , Beschreiben wie Cue funktioniert (onMousedragged, onMouseReleased,...) Kraft usw.
+### Cue
+Für die Verwendung des Cues werden die Methoden onMousePressed, onMouseReleased und setOnMouseDragged der Game-Klasse eingesetzt.
+Mit Drücken der Maus wird die onMousePressed-Methode aufgerufen und der Cue positioniert.
+Mit des setOnMouseDragged-Methode kann der Cue kann in alle Richtungen bewegt werden und somit die Stoßrichtung bestimmt werden.
+Weiters wird dabei die Kraft des Stoßes bestimmt.
+Je weiter z.B. der Cue nach hinten gezogen wird, desto größer wird die Differenz der Start- und Endposition des Cues.
+Somit kann z.B mehr Kraft auf den Cue ausgesetzt werden um die Stoßkraft zu verstärken.
+Sobald die Maus losgelassen wird, wird die onMouseReleased-Methode aufgerufen und der Stoß wird ausgeführt.
