@@ -17,7 +17,7 @@ sowie das Festhalten des aktiven Players an derselben Stelle gespeichert werden 
 ### Verwendung der Physics Engine dyn4j
 Die Klasse **Physic** verwendet eine Physics Engine um prüfen zu können, welche Objekte des Spieles
 miteinander interagieren. Neben den Interfaces RaycastListener, ContactListener und StepListener, implementiert
-Physic auch das Interfaces BillardListener. In diesem zusätzlichen Interfaces werden alle weiteren benötigen
+Physic auch das Interfaces BillardListener. In diesem zusätzlichen Interface werden alle weiteren benötigen
 Methoden definiert, die zum Billard spielen notwendig sind. Die performStrike-Methode ist z.B. 
 der Einstiegspunkt, wenn ein/e SpielerIn eine Kugel mit dem Cue angestoßen hat. Darin wird z.B. die gewirkte Kraft
 und Richtung auf den Ball angewandt.
