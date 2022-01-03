@@ -10,20 +10,33 @@ Das Jar-File *billard.jar* kann mittels Kommandozeile wie folgt gestartet werden
 *java -p  "<java_fx_path>" --add-modules javafx.controls,javafx.fxml -jar billard.jar* (wobei <java_fx_path> mit dem JAVA FX-Installationspfad des eigenen PCs angepasst werden muss.)
 
 
-Bianca:
-
 ### Wichtige Klasse und deren Verwendung
 Die beiden SpielerInnen werden über die Klasse Player abgebildet, damit der Score, Name (Player 1 und Player 2),
 sowie das Festhalten des aktiven Players an derselben Stelle gespeichert werden können.
+
+### Verwendung der Physics Engine dyn4j
+Die Klasse **Physic** verwendet eine Physics Engine um prüfen zu können, welche Objekte des Spieles
+miteinander interagieren. Neben den Interfaces RaycastListener, ContactListener und StepListener, implementiert
+Physic auch das Interfaces BillardListener. In diesem zusätzlichen Interfaces werden alle weiteren benötigen
+Methoden definiert, die zum Billard spielen notwendig sind. Die performStrike-Methode ist z.B. 
+der Einstiegspunkt, wenn ein/e SpielerIn eine Kugel mit dem Cue angestoßen hat. Darin wird z.B. die gewirkte Kraft
+und Richtung auf den Ball angewandt.
+
+Außerdem hängt Physic eng mit der Klasse GameLogic zusammen. Die Klasse Physic erkennt, welche Ereignisse aufgetreten sind und teilt diese
+dann der GameLogic mit, welche sich um die eigentliche Spielogik kümmert. Um dies zu realisieren, wurde das Observer Pattern verwendet.
+Die Klasse Physic hat dafür verschiedene Listeners, die jeweils beim Initialisieren der Klasse Game
+hinzugefügt werden. Die privaten Methoden notifyXXXListeners werden dann verwendet, um allen registrierten
+Listeners mitzuteilen, dass etwas für sie Relevantes passiert ist. Bei uns ist die GameLogic die einzige Klasse, welche
+eines dieser Interfaces implementiert, daher ist sie auch die einzige, die über ein derartiges Ereignis benachrichtigt wird. Potentiell könnten aber
+mehrere verschiedene Klassen dafür verwendet werden.
 
 
 ### Spielelogik und Zusammenhang mit Physic
 Um die Spielelogik getrennt von der Physic halten zu können, wurde die Klasse **GameLogic** erstellt.
 Hierin wird alles abgehandelt, was mit der Spielelogik und Befolgung der Regeln zusammenhängt.
-Bei uns erkennt die Klasse Physic mithilfe der Physics-Engine dyn4j, welche Ereignisse aufgetreten sind und teilt dies 
-dann der GameLogic mit, welche sich um die eigentliche Spielogik kümmert.
 Die Klasse GameLogic implementiert die Interfaces BallStrikeListener, BallPocketedListener, BallsCollisionListener 
-sowie ObjectsRestListener, damit auf die jeweiligen Ereignisse, die es von Physic bekommt, reagiert werden kann. Die Methode onStartAllObjectsRest wird dann aufgerufen, sobald ein Ball mit dem Cue angeschlagen wurde.
+sowie ObjectsRestListener, damit auf die jeweiligen Ereignisse, die es von Physic bekommt, reagiert werden kann. 
+Die Methode onStartAllObjectsRest wird dann aufgerufen, sobald ein Ball mit dem Cue angeschlagen wurde.
 Dies initialisiert auch die für die GameLogic notwendigen Listen.
 
 Wird z.B. ein Ball getroffen, ruft Physic die Methode onBallStrike auf. In dieser Methode
@@ -49,21 +62,6 @@ Die Methode handleEndState kümmert sich zudem um das Zurücksetzen der Bälle i
 die oberste Kugel (von der Startposition des Cue aus gesehen) freigelassen wird. Wenn also 
 14 Bälle (oder 15, falls der letzte Stoß die letzten zwei Kugeln versenkt hat) versenkt wurden, werden alle bisher versenkten
 Bälle wieder in diesem unvollständigem Dreieck positioniert.
-
-### Verwendung der Physics Engine dyn4j
-Die Klasse **Physic** verwendet eine Physics Engine um prüfen zu können, welche Objekte des Spieles
-miteinander interagieren. Neben den Interfaces RaycastListener, ContactListener und StepListener, implementiert
-Physic auch das Interfaces BillardListener. In diesem zusätzlichen Interfaces werden alle weiteren benötigen
-Methoden definiert, die zum Billard spielen notwendig sind. 
-
-Außerdem hängt Physic, wie bereits beschrieben, eng mit der Klasse GameLogic zusammen; dafür wurde das Observer Pattern verwendet.
-Die Klasse Physic hat dafür verschiedene Listeners, die jeweils beim Initialisieren der Klasse Game
-hinzugefügt werden. Die privaten Methoden notifyXXXListeners werden dann verwendet, um allen registrierten
-Listeners mitzuteilen, dass etwas für sie Relevantes passiert ist. Bei uns ist die GameLogic die einzige Klasse, welche
-eines dieser Interfaces implementiert, daher ist sie auch die einzige, die darüber benachrichtigt wird. Potentiell könnten aber
-mehrere verschiedene Klassen dafür verwendet werden.
-
-
 
 
 Ilona:
