@@ -45,10 +45,6 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
             this.name = name;
         }
 
-        public boolean equalsName(String other) {
-            return name.equals(other);
-        }
-
         public String toString() {
             return name;
         }

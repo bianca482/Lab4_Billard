@@ -8,6 +8,7 @@ import at.fhv.sysarch.lab4.logic.GameLogic;
 import at.fhv.sysarch.lab4.physics.Physic;
 import at.fhv.sysarch.lab4.rendering.Renderer;
 import javafx.scene.input.MouseEvent;
+import org.dyn4j.geometry.Vector2;
 
 public class Game {
 
@@ -40,7 +41,7 @@ public class Game {
         activePlayer = player1;
         player1.setActivePlayer(true);
 
-        this.gameState = GameState.GAME_PAUSED;
+        this.gameState = GameState.GAME_RUNNING;
 
         this.initWorld();
     }
@@ -165,11 +166,29 @@ public class Game {
         double pX = this.getRenderer().screenToPhysicsX(x);
         double pY = this.getRenderer().screenToPhysicsY(y);
 
-        if (gameState.equals(GameState.GAME_PAUSED)) {
+        if (gameState.equals(GameState.GAME_RUNNING)) {
             this.getCue().setStartPosition(pX, pY);
         } else if (gameState.equals(GameState.SET_WHITE_BALL)) {
-            this.whiteBall.setPosition(pX, pY);
-            gameState = GameState.GAME_PAUSED;
+            // Prüfen, ob die Position nicht außerhalb des Tisches liegt
+            if (!(Math.abs(pX) > Table.Constants.WIDTH / 2 || Math.abs(pY) > Table.Constants.HEIGHT / 2)) {
+
+                // ToDo: Prüfen, ob kein Ball auf der gewünschten Position ist
+//                boolean canPlaceBall = true;
+//                for (Ball b : balls) {
+//                    if (b.getPosition().distance(new Vector2(pX, pY)) <= 0.05) {
+//                        System.out.println(b.getPosition().distance(new Vector2(pX, pY)));
+//                        canPlaceBall = false;
+//                    }
+//                }
+//
+//                if (canPlaceBall) {
+//                    this.whiteBall.setPosition(pX, pY);
+//                    gameState = GameState.GAME_RUNNING;
+//                }
+
+                this.whiteBall.setPosition(pX, pY);
+                gameState = GameState.GAME_RUNNING;
+            }
         }
     }
 
@@ -183,7 +202,9 @@ public class Game {
         double pX = this.getRenderer().screenToPhysicsX(x);
         double pY = this.getRenderer().screenToPhysicsY(y);
 
-        this.getPhysic().performStrike(this.getCue().getStartX(), this.getCue().getStartY(), pX, pY);
+        if (gameState.equals(GameState.GAME_RUNNING)) {
+            this.getPhysic().performStrike(this.getCue().getStartX(), this.getCue().getStartY(), pX, pY);
+        }
     }
 
     public void setOnMouseDragged(MouseEvent e) {
@@ -196,7 +217,9 @@ public class Game {
         double pX = this.getRenderer().screenToPhysicsX(x);
         double pY = this.getRenderer().screenToPhysicsY(y);
 
-        this.getCue().setEndPosition(pX, pY);
+        if (gameState.equals(GameState.GAME_RUNNING)) {
+            this.getCue().setEndPosition(pX, pY);
+        }
     }
 
     public List<Ball> getBalls() {
