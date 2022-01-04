@@ -172,22 +172,20 @@ public class Game {
             // Prüfen, ob die Position nicht außerhalb des Tisches liegt
             if (!(Math.abs(pX) > Table.Constants.WIDTH / 2 || Math.abs(pY) > Table.Constants.HEIGHT / 2)) {
 
-                // ToDo: Prüfen, ob kein Ball auf der gewünschten Position ist
-//                boolean canPlaceBall = true;
-//                for (Ball b : balls) {
-//                    if (b.getPosition().distance(new Vector2(pX, pY)) <= 0.05) {
-//                        System.out.println(b.getPosition().distance(new Vector2(pX, pY)));
-//                        canPlaceBall = false;
-//                    }
-//                }
-//
-//                if (canPlaceBall) {
-//                    this.whiteBall.setPosition(pX, pY);
-//                    gameState = GameState.GAME_RUNNING;
-//                }
+                // Prüfen, ob kein Ball auf der gewünschten Position ist
+                boolean canPlaceBall = true;
+                for (Ball b : balls) {
+                    // Anhand des Abstand feststellen, ob sie sich die Positionen überschneiden
+                    if (b.getPosition().distance(new Vector2(pX, pY)) <= 0.09) {
+                        System.out.println(b.getPosition().distance(new Vector2(pX, pY)));
+                        canPlaceBall = false;
+                    }
+                }
 
-                this.whiteBall.setPosition(pX, pY);
-                gameState = GameState.GAME_RUNNING;
+                if (canPlaceBall) {
+                    this.whiteBall.setPosition(pX, pY);
+                    gameState = GameState.GAME_RUNNING;
+                }
             }
         }
     }
@@ -196,13 +194,14 @@ public class Game {
         if (gameLogic.isDeactivateUi()) {
             return;
         }
-        double x = e.getX();
-        double y = e.getY();
-
-        double pX = this.getRenderer().screenToPhysicsX(x);
-        double pY = this.getRenderer().screenToPhysicsY(y);
 
         if (gameState.equals(GameState.GAME_RUNNING)) {
+            double x = e.getX();
+            double y = e.getY();
+
+            double pX = this.getRenderer().screenToPhysicsX(x);
+            double pY = this.getRenderer().screenToPhysicsY(y);
+
             this.getPhysic().performStrike(this.getCue().getStartX(), this.getCue().getStartY(), pX, pY);
         }
     }
@@ -211,13 +210,14 @@ public class Game {
         if (gameLogic.isDeactivateUi()) {
             return;
         }
-        double x = e.getX();
-        double y = e.getY();
-
-        double pX = this.getRenderer().screenToPhysicsX(x);
-        double pY = this.getRenderer().screenToPhysicsY(y);
 
         if (gameState.equals(GameState.GAME_RUNNING)) {
+            double x = e.getX();
+            double y = e.getY();
+
+            double pX = this.getRenderer().screenToPhysicsX(x);
+            double pY = this.getRenderer().screenToPhysicsY(y);
+
             this.getCue().setEndPosition(pX, pY);
         }
     }
