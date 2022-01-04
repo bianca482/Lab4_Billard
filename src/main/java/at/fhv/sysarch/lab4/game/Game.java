@@ -20,6 +20,7 @@ public class Game {
     private Cue cue;
     private List<Ball> balls;
     private Ball whiteBall;
+    private GameState gameState;
 
 
     public Game(Renderer renderer, Physic physic) {
@@ -38,6 +39,8 @@ public class Game {
         this.renderer.setPlayer2(player2);
         activePlayer = player1;
         player1.setActivePlayer(true);
+
+        this.gameState = GameState.GAME_PAUSED;
 
         this.initWorld();
     }
@@ -80,6 +83,10 @@ public class Game {
 
     protected Cue getCue() {
         return cue;
+    }
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
     }
 
     public void placeBalls(List<Ball> balls) {
@@ -158,7 +165,12 @@ public class Game {
         double pX = this.getRenderer().screenToPhysicsX(x);
         double pY = this.getRenderer().screenToPhysicsY(y);
 
-        this.getCue().setStartPosition(pX, pY);
+        if (gameState.equals(GameState.GAME_PAUSED)) {
+            this.getCue().setStartPosition(pX, pY);
+        } else if (gameState.equals(GameState.SET_WHITE_BALL)) {
+            this.whiteBall.setPosition(pX, pY);
+            gameState = GameState.GAME_PAUSED;
+        }
     }
 
     public void onMouseReleased(MouseEvent e) {

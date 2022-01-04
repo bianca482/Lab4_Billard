@@ -2,6 +2,7 @@ package at.fhv.sysarch.lab4.logic;
 
 import at.fhv.sysarch.lab4.game.Ball;
 import at.fhv.sysarch.lab4.game.Game;
+import at.fhv.sysarch.lab4.game.GameState;
 import at.fhv.sysarch.lab4.game.Table;
 import at.fhv.sysarch.lab4.logic.listener.BallStrikeListener;
 import at.fhv.sysarch.lab4.logic.listener.BallPocketedListener;
@@ -23,7 +24,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
     private Ball ballTouchedByCue;
     private List<Ball> contactedBalls = new LinkedList<>();
     private Set<Ball> pocketBalls = new HashSet<>();
-    private List<String> fouls = new LinkedList<>();
+    private List<Foul> fouls = new LinkedList<>();
     private boolean deactivateUi = false;
     private Vector2 whiteBallOldPosition;
 
@@ -31,6 +32,26 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
         this.game = game;
         this.renderer = renderer;
         this.physic = physic;
+    }
+
+    private enum Foul {
+        WHITE_BALL_IN_POCKET ("White Ball is in pocket."),
+        WHITE_BALL_NOT_HIT ("Player did not hit the white ball."),
+        WHITE_BALL_HIT_NO_OBJECT_BALL ("White ball did not touch any object ball.");
+
+        private final String name;
+
+        Foul(String name) {
+            this.name = name;
+        }
+
+        public boolean equalsName(String other) {
+            return name.equals(other);
+        }
+
+        public String toString() {
+            return name;
+        }
     }
 
     public boolean isDeactivateUi() {
@@ -42,7 +63,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
         this.renderer.setFoulMessage("");
         // Foul: It is a foul if any other ball than the white one is stroke by the cue.
         if (!b.equals(WHITE)) {
-            fouls.add("Player did not hit the white ball.");
+            fouls.add(Foul.WHITE_BALL_NOT_HIT);
         }
         whiteBallOldPosition = oldPosition;
         ballTouchedByCue = b;
@@ -53,7 +74,7 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
         pocketBalls.add(b);
         // Foul: It is a foul if the white ball is pocketed.
         if (b.isWhite()) {
-            fouls.add("White Ball is in pocket.");
+            fouls.add(Foul.WHITE_BALL_IN_POCKET);
         }
         b.setVisible(false);
         b.getBody().setLinearVelocity(0, 0); // Wartezeit verringern von Bällen die versenkt worden sind
@@ -72,22 +93,31 @@ public class GameLogic implements BallStrikeListener, BallPocketedListener, Ball
     @Override
     public void onEndAllObjectsRest() {
         // Kein Ball bewegt sich mehr. Punkte zählen und nächsten Spieler auswählen
-        if (contactedBalls.size() == 0) {
+        if (contactedBalls.size() == 0 && !fouls.contains(Foul.WHITE_BALL_NOT_HIT) && !fouls.contains(Foul.WHITE_BALL_IN_POCKET)) {
             // Foul: It is a foul if the white ball does not touch any object ball.
-            fouls.add("White ball did not touch any object ball.");
+            fouls.add(Foul.WHITE_BALL_HIT_NO_OBJECT_BALL);
         }
 
         if (fouls.size() != 0) {
             game.getActivePlayer().addScore(-1);
             StringBuilder allFouls = new StringBuilder();
 
-            for (String foul : fouls) {
-                allFouls.append(foul).append("\n");
+            for (Foul foul : fouls) {
+                allFouls.append(foul.name).append("\n");
             }
 
+            StringBuilder actionMessage = new StringBuilder();
+            actionMessage.append(game.getActivePlayer().getName()).append(" committed a foul, switching players.");
+
             renderer.setFoulMessage(allFouls.toString());
-            renderer.setActionMessage(game.getActivePlayer().getName() + " committed a foul, switching players.");
             game.switchPlayer();
+
+            if (fouls.contains(Foul.WHITE_BALL_HIT_NO_OBJECT_BALL)) {
+                actionMessage.append(" ").append(game.getActivePlayer().getName()).append(" can place the white ball free hand.");
+                game.setGameState(GameState.SET_WHITE_BALL);
+            }
+
+            renderer.setActionMessage(actionMessage.toString());
 
             // TODO
             // Verbleibt weiße Kugel auf dem Tisch, könnt ihr ein Platzieren per Hand implementieren.
