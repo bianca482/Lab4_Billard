@@ -160,13 +160,14 @@ public class Game {
         if (gameLogic.isDeactivateUi()) {
             return;
         }
-        double x = e.getX();
-        double y = e.getY();
-
-        double pX = this.getRenderer().screenToPhysicsX(x);
-        double pY = this.getRenderer().screenToPhysicsY(y);
 
         if (gameState.equals(GameState.GAME_RUNNING)) {
+            double x = e.getX();
+            double y = e.getY();
+
+            double pX = this.getRenderer().screenToPhysicsX(x);
+            double pY = this.getRenderer().screenToPhysicsY(y);
+
             this.getCue().setStartPosition(pX, pY);
         }
     }
@@ -182,8 +183,6 @@ public class Game {
         double pY = this.getRenderer().screenToPhysicsY(y);
 
         if (gameState.equals(GameState.GAME_RUNNING)) {
-
-
             this.getPhysic().performStrike(this.getCue().getStartX(), this.getCue().getStartY(), pX, pY);
         }else if (gameState.equals(GameState.SET_WHITE_BALL)) {
             // Prüfen, ob die Position nicht außerhalb des Tisches liegt
