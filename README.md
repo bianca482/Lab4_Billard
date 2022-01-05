@@ -11,8 +11,28 @@ Das Jar-File *billard.jar* kann mittels Kommandozeile wie folgt gestartet werden
 
 
 ### Wichtige Klasse und deren Verwendung
+#### Player
 Die beiden SpielerInnen werden über die Klasse Player abgebildet, damit der Score, Name (Player 1 und Player 2),
 sowie das Festhalten des aktiven Players an derselben Stelle gespeichert werden können.
+
+#### Cue
+Für die Verwendung des Cues werden die Methoden onMousePressed, onMouseReleased und setOnMouseDragged der Game-Klasse eingesetzt.
+Mit Drücken der Maus wird die onMousePressed-Methode aufgerufen und der Cue positioniert.
+Mit des setOnMouseDragged-Methode kann der Cue kann in alle Richtungen bewegt werden und somit die Stoßrichtung bestimmt werden.
+Weiters wird dabei die Kraft des Stoßes bestimmt.
+Je weiter z.B. der Cue nach hinten gezogen wird, desto größer wird die Differenz der Start- und Endposition des Cues.
+Somit kann z.B mehr Kraft auf den Cue ausgesetzt werden um die Stoßkraft zu verstärken.
+Sobald die Maus losgelassen wird, wird die onMouseReleased-Methode aufgerufen und der Stoß wird ausgeführt.
+
+#### Game
+Die Klasse **Game** wurde um ein Enum **GameState** erweitert, damit das beliebige Platzieren der weißen Kugel implementiert werden kann.
+Es gibt zwei verschiedene States, die das Game haben kann: 
+- Der eine GameState ist *GAME_RUNNING*, welcher per Default eingestellt ist. Ist dieser State aktiv, kann eine Kugel normal angestoßen werden und die Positionen des Cue
+werden angepasst.
+- *SET_WHITE_BALL* hingegen ist der State, in dem sich das Spiel befindet, wenn das Foul *"It is a foul if the white ball does not touch any object ball."* begangen wurde. 
+Dann darf der Spieler per Mouse-Click bestimmen, wohin er die weiße Kugel setzen möchte. Ist dieser State aktiv, reagiert Game ansonsten auf keine weiteren MouseClicked/ -Pressed oder -Released Events mehr.
+Beim Setzen der Positon muss beachtet werden, dass auch eine gültige neue Position für die weiße Kugel bestimmt wird. Eine ungültige Position ist es, wenn 
+sich die Kugel außerhalb des Tisches befinden würde oder sich auf einer anderen Kugel befindet bzw. mit der Position einer anderen Kugel überschneidet.
 
 ### Verwendung der Physics Engine dyn4j
 Die Klasse **Physic** verwendet eine Physics Engine um prüfen zu können, welche Objekte des Spieles
@@ -58,6 +78,9 @@ Falls kein Foul begangen wurde, wird anhand der Anzahl der versenkten Kugeln die
 berechnet. Außerdem wird der Spieler gleich gewechselt, wenn gar kein Ball versenkt wurde. Ansonsten werden wieder die
 jeweiligen Messages gesetzt und das Spiel kann weitergehen.
 
+Beim Foul *"It is a foul if the white ball does not touch any object ball."* darf der Player, der das Foul nicht begangen hat, 
+die weiße Kugel frei Hand setzen. Um dies implementieren zu können, wird der GameState verwendet, was in dem Kapitel über Game erklärt wird.
+
 Damit versenkte Kugeln nicht mehr angezeigt werden, werden diese Kuglen mit der setVisible-Methode unsichtbar gemacht.
 Wird eine Kugel so fest angestoßen, sodass sie über den Tisch gespielt wird und sich somit außerhalb des Tisches befindet, wird dies, außer es handelt sich um die weiße Kugel, nicht als Foul gewertet.
 Da sich diese Kugel aber nicht mehr auf dem Tisch befindet wird sie ebenfalls unsichtbar gemacht.
@@ -71,11 +94,3 @@ die oberste Kugel (von der Startposition des Cue aus gesehen) freigelassen wird.
 Bälle wieder in diesem unvollständigem Dreieck positioniert.
 
 
-### Cue
-Für die Verwendung des Cues werden die Methoden onMousePressed, onMouseReleased und setOnMouseDragged der Game-Klasse eingesetzt.
-Mit Drücken der Maus wird die onMousePressed-Methode aufgerufen und der Cue positioniert.
-Mit des setOnMouseDragged-Methode kann der Cue kann in alle Richtungen bewegt werden und somit die Stoßrichtung bestimmt werden.
-Weiters wird dabei die Kraft des Stoßes bestimmt.
-Je weiter z.B. der Cue nach hinten gezogen wird, desto größer wird die Differenz der Start- und Endposition des Cues.
-Somit kann z.B mehr Kraft auf den Cue ausgesetzt werden um die Stoßkraft zu verstärken.
-Sobald die Maus losgelassen wird, wird die onMouseReleased-Methode aufgerufen und der Stoß wird ausgeführt.
