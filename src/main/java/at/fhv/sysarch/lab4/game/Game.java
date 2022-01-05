@@ -168,7 +168,24 @@ public class Game {
 
         if (gameState.equals(GameState.GAME_RUNNING)) {
             this.getCue().setStartPosition(pX, pY);
-        } else if (gameState.equals(GameState.SET_WHITE_BALL)) {
+        }
+    }
+
+    public void onMouseReleased(MouseEvent e) {
+        if (gameLogic.isDeactivateUi()) {
+            return;
+        }
+        double x = e.getX();
+        double y = e.getY();
+
+        double pX = this.getRenderer().screenToPhysicsX(x);
+        double pY = this.getRenderer().screenToPhysicsY(y);
+
+        if (gameState.equals(GameState.GAME_RUNNING)) {
+
+
+            this.getPhysic().performStrike(this.getCue().getStartX(), this.getCue().getStartY(), pX, pY);
+        }else if (gameState.equals(GameState.SET_WHITE_BALL)) {
             // Prüfen, ob die Position nicht außerhalb des Tisches liegt
             if (!(Math.abs(pX) > Table.Constants.WIDTH / 2 || Math.abs(pY) > Table.Constants.HEIGHT / 2)) {
 
@@ -187,22 +204,6 @@ public class Game {
                     gameState = GameState.GAME_RUNNING;
                 }
             }
-        }
-    }
-
-    public void onMouseReleased(MouseEvent e) {
-        if (gameLogic.isDeactivateUi()) {
-            return;
-        }
-
-        if (gameState.equals(GameState.GAME_RUNNING)) {
-            double x = e.getX();
-            double y = e.getY();
-
-            double pX = this.getRenderer().screenToPhysicsX(x);
-            double pY = this.getRenderer().screenToPhysicsY(y);
-
-            this.getPhysic().performStrike(this.getCue().getStartX(), this.getCue().getStartY(), pX, pY);
         }
     }
 
