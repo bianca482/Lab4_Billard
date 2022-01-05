@@ -193,7 +193,6 @@ public class Game {
                 for (Ball b : balls) {
                     // Anhand des Abstand feststellen, ob sie sich die Positionen überschneiden
                     if (b.getPosition().distance(new Vector2(pX, pY)) <= 0.09) {
-                        System.out.println(b.getPosition().distance(new Vector2(pX, pY)));
                         canPlaceBall = false;
                     }
                 }
