@@ -81,7 +81,7 @@ jeweiligen Messages gesetzt und das Spiel kann weitergehen.
 Beim Foul *"It is a foul if the white ball does not touch any object ball."* darf der Player, der das Foul nicht begangen hat, 
 die weiße Kugel frei Hand setzen. Um dies implementieren zu können, wird der GameState verwendet, was in dem Kapitel über Game erklärt wird.
 
-Damit versenkte Kugeln nicht mehr angezeigt werden, werden diese Kuglen mit der setVisible-Methode unsichtbar gemacht.
+Damit versenkte Kugeln nicht mehr angezeigt werden, werden diese Kugeln mit der setVisible-Methode unsichtbar gemacht.
 Wird eine Kugel so fest angestoßen, sodass sie über den Tisch gespielt wird und sich somit außerhalb des Tisches befindet, wird dies, außer es handelt sich um die weiße Kugel, nicht als Foul gewertet.
 Da sich diese Kugel aber nicht mehr auf dem Tisch befindet wird sie ebenfalls unsichtbar gemacht.
 
